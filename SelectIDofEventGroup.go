@@ -10,15 +10,20 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func GetIDofEventbox() (
-	idofeventbox []string,
+const EventBox=6
+const BlockEvent=5
+
+func SelectIDofEventGroup(
+	mode int,
+	) (
+	idofeventgroup []string,
 	err error,
 ) {
 
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 
-	sqlstmt := "select eventid from " + srdblib.Tevent + " where achk = 6"
+	sqlstmt := "select eventid from " + srdblib.Tevent + " where achk = ?"
 	stmt, srdblib.Dberr = srdblib.Db.Prepare(sqlstmt)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("row.Priepare(): %w", srdblib.Dberr)
@@ -26,14 +31,14 @@ func GetIDofEventbox() (
 	}
 	defer stmt.Close()
 
-	rows, srdblib.Dberr = stmt.Query()
+	rows, srdblib.Dberr = stmt.Query(mode)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("stmt.Query(): %w", srdblib.Dberr)
 		return
 	}
 	defer rows.Close()
 
-	idofeventbox = make([]string, 0)
+	idofeventgroup = make([]string, 0)
 
 	id := ""
 	for rows.Next() {
@@ -43,7 +48,7 @@ func GetIDofEventbox() (
 			return
 		}
 		log.Printf(" parent id = %s\n", id)
-		idofeventbox = append(idofeventbox, id)
+		idofeventgroup = append(idofeventgroup, id)
 	}
 	return
 }

@@ -272,6 +272,7 @@ func InsertIntoEvent(eventlist []srapi.Event) (
 }
 func main() {
 
+	//      ログファイルを開く。
 	logfile, err := exsrapi.CreateLogfile("SRCGE")
 	if err != nil {
 		log.Printf("err=%s.\n", err.Error())
@@ -291,21 +292,42 @@ func main() {
 	defer srdblib.Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
+	//      テーブルは"w"で始まるものを操作の対象とする。
 	srdblib.Tevent = "wevent"
 	srdblib.Teventuser = "weventuser"
 	srdblib.Tuser = "wuser"
 	srdblib.Tuserhistory = "wuserhistory"
 
+	//      現在開催中のイベントの一覧を求める。
 	t008top, err := GetCurrentEventList()
 	if err != nil {
 		log.Printf("GetCurrentEventList(): %s", err.Error())
 		return
 	}
 
+	//	取得したイベント情報をデータベースに格納する。
 	err = InsertIntoEvent(t008top.Eventlist)
 	if err != nil {
 		log.Printf("InsertIntoEvent(): %s", err.Error())
 		return
 	}
+
+	//	ブロックイベントを展開する。
+	err = InsertBlockeventToEvent()
+	if err != nil {
+		log.Printf("InsertBlockeventToEvent(): %s", err.Error())
+	}
+
+	//	イベントボックスを展開する。
+	err = InsertEventBoxToEvent()
+	if err != nil {
+		log.Printf("InsertEventBoxToWevent(): %s", err.Error())
+	}
+
+
+	//	結果が発表されたイベントの順位と獲得ポイントを取得する
+	//	これはイベント終了日の翌日12時から翌々日12時までのあいだに行う必要がある)
+	//	前日終了のイベントのデータを取得するか、前々日のものを取得するかは実行時刻に応じて判断される。
+	GetRoominfAll()
 
 }

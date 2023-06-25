@@ -14,7 +14,7 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func TestGetIDofEventbox(t *testing.T) {
+func TestSelectIDofEventGroup(t *testing.T) {
 	tests := []struct {
 		name             string
 		wantIdofeventbox []string
@@ -28,7 +28,7 @@ func TestGetIDofEventbox(t *testing.T) {
 		// TODO: Add test cases.
 	}
 
-	logfile, err := exsrapi.CreateLogfile("TestGetIDofEventbox")
+	logfile, err := exsrapi.CreateLogfile("TestSelectIDofEventGroup")
 	if err != nil {
 		log.Printf("err=%s.\n", err.Error())
 		return
@@ -54,7 +54,7 @@ func TestGetIDofEventbox(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotIdofeventbox, err := GetIDofEventbox()
+			gotIdofeventbox, err := SelectIDofEventGroup(EventBox)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAndInsertEventBox() error = %v, wantErr %v", err, tt.wantErr)
 				return

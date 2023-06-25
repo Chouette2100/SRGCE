@@ -312,9 +312,9 @@ func GetEventInfAndRoomListBR(
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
-	bufstr := buf.String()
 
-	log.Printf("%s\n", bufstr)
+	//	bufstr := buf.String()
+	//	log.Printf("%s\n", bufstr)
 
 	//	doc, error = goquery.NewDocumentFromReader(resp.Body)
 	doc, error = goquery.NewDocumentFromReader(buf)
@@ -407,6 +407,7 @@ func GetEventInfAndRoomListBR(
 		roominfo.Name = br.Room_name
 
 		roominfo.Irank = i + 1
+		roominfo.Point = br.Point
 
 		*roominfolist = append(*roominfolist, roominfo)
 

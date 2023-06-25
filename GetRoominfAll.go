@@ -30,10 +30,20 @@ func GetRoominfAll() (
 	defer jar.Save()
 
 	tnow := time.Now().Truncate((time.Second))	// 秒より下を切り捨てる。時刻の比較を整数の比較と同等にする。
-	tday1 := tnow.Truncate(24 * time.Hour).Add(-57 * time.Hour)
-	tday2 := tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
-	//	tday1 := tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
-	//	tday2 := tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
+	hh, _, _ := tnow.Clock()
+
+	var tday1, tday2 time.Time
+	if hh < 12 {
+		//	12時までは前々日に終了したイベントの結果が表示されている。
+		tday1 = tnow.Truncate(24 * time.Hour).Add(-57 * time.Hour)
+		tday2 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
+
+	} else {
+		//	12時をすぎると前日に終了したイベントの結果が表示される。
+		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
+		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
+
+	}
 	log.Printf("tday:  %s\n", tnow.Format("2006-01-02 15:04:05 MST"))
 	log.Printf("tday1: %s\n", tday1.Format("2006-01-02 15:04:05 MST"))
 	log.Printf("tday2: %s\n", tday2.Format("2006-01-02 15:04:05 MST"))
@@ -53,7 +63,7 @@ func GetRoominfAll() (
 	}
 	defer rows.Close()
 
-	idofeventbox := make([]string, 0)
+	idofevent := make([]string, 0)
 
 	id := ""
 	for rows.Next() {
@@ -62,11 +72,11 @@ func GetRoominfAll() (
 			err = fmt.Errorf("rows.Scan(): %w", srdblib.Dberr)
 			return
 		}
-		idofeventbox = append(idofeventbox, id)
+		idofevent = append(idofevent, id)
 	}
 
 	log.Printf("==================================\n")
-	for _, id := range idofeventbox {
+	for _, id := range idofevent {
 		var eventinf exsrapi.Event_Inf
 		var roominfolist RoomInfoList
 		if ! strings.Contains(id, "?") {
