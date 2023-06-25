@@ -78,11 +78,11 @@ func GetRoominfAll() (
 	log.Printf("==================================\n")
 	for _, id := range idofevent {
 		var eventinf exsrapi.Event_Inf
-		var roominfolist RoomInfoList
+		var roominfolist exsrapi.RoomInfoList
 		if ! strings.Contains(id, "?") {
-			GetEventInfAndRoomList(id, 1, 30, &eventinf, &roominfolist)
+			exsrapi.GetEventinfAndRoomList(id, 1, 30, &eventinf, &roominfolist)
 		} else {
-			GetEventInfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
+			exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
 		}
 		for _, room := range roominfolist {
 			InsertIntoEventuser(eventinf.Event_ID, room)

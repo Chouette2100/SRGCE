@@ -4,10 +4,11 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srdblib"
 
 )
-func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf RoomInfo) (status int) {
+func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf exsrapi.RoomInfo) (status int) {
 
 	status = 0
 
