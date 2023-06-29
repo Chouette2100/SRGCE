@@ -7,18 +7,22 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srdblib"
 )
 
-const EventBox=6
-const BlockEvent=5
+const EventBox = 6
+const BlockEvent = 5
 
-func SelectIDofEventGroup(
+func ExtractIDofEventGroup(
 	mode int,
-	) (
+) (
 	idofeventgroup []string,
 	err error,
 ) {
+
+	fn := exsrapi.PrtHdr()
+	defer exsrapi.PrintExf("", fn)()
 
 	var stmt *sql.Stmt
 	var rows *sql.Rows

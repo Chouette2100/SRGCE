@@ -13,7 +13,7 @@ import (
 	"github.com/Chouette2100/exsrapi"
 )
 
-func TestGetRoominfAll(t *testing.T) {
+func TestCollectRoominfFromEndEvent(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -55,7 +55,7 @@ func TestGetRoominfAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := GetRoominfAll(); (err != nil) != tt.wantErr {
+			if err := CollectRoominfFromEndEvent(); (err != nil) != tt.wantErr {
 				t.Errorf("GetRoominfAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

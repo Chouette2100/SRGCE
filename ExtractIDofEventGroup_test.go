@@ -14,7 +14,7 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func TestSelectIDofEventGroup(t *testing.T) {
+func TestExtractIDofEventGroup(t *testing.T) {
 	tests := []struct {
 		name             string
 		wantIdofeventbox []string
@@ -54,7 +54,7 @@ func TestSelectIDofEventGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotIdofeventbox, err := SelectIDofEventGroup(EventBox)
+			gotIdofeventbox, err := ExtractIDofEventGroup(EventBox)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAndInsertEventBox() error = %v, wantErr %v", err, tt.wantErr)
 				return
