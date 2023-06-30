@@ -13,7 +13,12 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func CreateEventuserFromEventinf(eventid string, roominf exsrapi.RoomInfo) (err error) {
+func CreateEventuserFromEventinf(
+	eventid string, roominf exsrapi.RoomInfo,
+	) (
+		status string,
+		err error,
+		) {
 
 	//	fn := exsrapi.PrtHdr()
 	//	defer exsrapi.PrintExf("", fn)()
@@ -22,6 +27,7 @@ func CreateEventuserFromEventinf(eventid string, roominf exsrapi.RoomInfo) (err 
 
 	//	レコードがすでに存在するか？
 	nrow := 0
+	status = "ignored."
 	sqls := "select count(*) from " + srdblib.Teventuser + " where userno =? and eventid = ?"
 	err = srdblib.Db.QueryRow(sqls, roominf.ID, eventid).Scan(&nrow)
 	if err != nil {
@@ -54,6 +60,7 @@ func CreateEventuserFromEventinf(eventid string, roominf exsrapi.RoomInfo) (err 
 			log.Printf("error(InsertIntoOrUpdateUser() INSERT/Exec) err=%s\n", err.Error())
 			err = fmt.Errorf("Exec(): %w", err)
 		}
+		status = "inserted."
 	}
 	return
 

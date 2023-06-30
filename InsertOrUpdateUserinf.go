@@ -1,20 +1,24 @@
 package main
+
 import (
-	"time"
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srdblib"
-
 )
-func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf exsrapi.RoomInfo) (status string, err error) {
 
-	status ="ignored"
+func InsertIntoOrUpdateUser(
+	tnow time.Time, eventid string, roominf exsrapi.RoomInfo,
+) (
+	err error,
+) {
+
 	isnew := false
 
 	userno, _ := strconv.Atoi(roominf.ID)
@@ -47,7 +51,7 @@ func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf exsrapi.Room
 		//	log.Printf("insert into " + srdblib.Tuserhistory + "(*new*) userno=%d rank=<%s> nrank=<%s> prank=<%s> level=%d, followers=%d, fans=%d, fans_lst=%d\n",
 		//		userno, roominf.Rank, roominf.Nrank, roominf.Prank, roominf.Level, roominf.Followers, fans, fans_lst)
 
-		sqli := "INSERT INTO " +srdblib.Tuser + " (userno, userid, user_name, longname, shortname, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts, currentevent)"
+		sqli := "INSERT INTO " + srdblib.Tuser + " (userno, userid, user_name, longname, shortname, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts, currentevent)"
 		sqli += " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 		//	log.Printf("sql=%s\n", sql)
@@ -104,7 +108,6 @@ func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf exsrapi.Room
 				//	log.Printf("error(InsertIntoOrUpdateUser() INSERT/Exec) err=%s\n", err.Error())
 				err = fmt.Errorf("Exec(): %w", err)
 			}
-			status ="inserted"
 		}
 	} else {
 		//	存在する。
@@ -171,7 +174,6 @@ func InsertIntoOrUpdateUser(tnow time.Time, eventid string, roominf exsrapi.Room
 				log.Printf("error(InsertIntoOrUpdateUser() Update/Exec) err=%s\n", err.Error())
 				err = fmt.Errorf("Exec(): %w", err)
 			}
-			status = "updated"
 		}
 		/* else {
 			//	log.Printf("not insert into userhistory(*same*) userno=%d level=%d, followers=%d\n", userno, roominf.Level, roominf.Followers)

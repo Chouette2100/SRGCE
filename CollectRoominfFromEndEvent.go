@@ -89,18 +89,24 @@ func CollectRoominfFromEndEvent() (
 			exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
 		}
 		for _, room := range roominfolist {
-			err = CreateEventuserFromEventinf(eventinf.Event_ID, room)
+			status := ""
+			status, err = CreateEventuserFromEventinf(eventinf.Event_ID, room)
 			if err != nil {
 				err = fmt.Errorf("CreateEventuserFromEventinf(): %w", err)
+				status = "**error"
+				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, room.Account, room.Userno, room.Irank, room.Point, eventinf.Event_ID)
 				return
+			} else {
+				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, room.Account, room.Userno, room.Irank, room.Point, eventinf.Event_ID)
+				if status == "ignored." {
+					continue
+				}
 			}
-			status := ""
-			status, err = InsertIntoOrUpdateUser(tnow, eventinf.Event_ID, room)
+			err = InsertIntoOrUpdateUser(tnow, eventinf.Event_ID, room)
 			if err != nil {
 				err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
 				return
 			}
-			log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, room.Account, room.Userno, room.Irank, room.Point, eventinf.Event_ID)
 		}
 	}
 
