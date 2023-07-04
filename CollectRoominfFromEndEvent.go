@@ -35,17 +35,22 @@ func CollectRoominfFromEndEvent() (
 	tnow := time.Now().Truncate((time.Second)) // 秒より下を切り捨てる。時刻の比較を整数の比較と同等にする。
 	hh, _, _ := tnow.Clock()
 
+	//	現時点で結果が表示されるイベントの終了時刻の範囲を求める。
+	//	tnow.Truncate(24 * time.Hour)はUTCで計算されている模様。
+	//	特にg時まではtnow.Truncate(24 * time.Hour)の結果は1日前になることに注意
 	var tday1, tday2 time.Time
-	if hh < 12 {
+	if hh < 9 {
+		//	12時までは前々日に終了したイベントの結果が表示されている(上記コメント参照)
+		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
+		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
+	} else if hh < 12 {
 		//	12時までは前々日に終了したイベントの結果が表示されている。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-57 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
-
 	} else {
 		//	12時をすぎると前日に終了したイベントの結果が表示される。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
-
 	}
 	log.Printf("tday:  %s\n", tnow.Format("2006-01-02 15:04:05 MST"))
 	log.Printf("tday1: %s\n", tday1.Format("2006-01-02 15:04:05 MST"))
@@ -81,6 +86,17 @@ func CollectRoominfFromEndEvent() (
 	log.Printf("==================================\n")
 	for _, id := range idofevent {
 		log.Printf("eventid: %s\n", id)
+
+		//	取得すべきデータの存在チェック（取得済みかのチェック）
+		nrow := 0
+		sqlsc := "select count(*) from " + srdblib.Teventuser + " where eventid = ?"
+		srdblib.Db.QueryRow(sqlsc, id).Scan(&nrow)
+		if nrow > 0 {
+			//	取得済み
+			log.Printf("    data exists. skip.\n")
+			continue
+		}
+
 		var eventinf exsrapi.Event_Inf
 		var roominfolist exsrapi.RoomInfoList
 		if !strings.Contains(id, "?") {

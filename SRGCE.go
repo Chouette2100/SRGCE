@@ -168,6 +168,9 @@ http://localhost:8080/t008top
 
 	Ver. 01AA00	基本的動作を確認する。
 	Ver. 01AB00	進捗状況の表示をuserの更新基準からeventuserの更新基準に変更する。
+	Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
+	Ver. 01AB02	最終結果取得済みのイベントをスキップする。
+	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
 */
 package main
 
@@ -188,7 +191,7 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-const Version = "01AB00"
+const Version = "01AC00"
 
 func main() {
 
