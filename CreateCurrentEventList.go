@@ -22,7 +22,14 @@ var Db *sql.DB
 var Err error
 */
 
-func CreateCurrentEventList() (
+/*
+	開催中あるいは開催予定のイベントの一覧を取得する。
+	CreateCurrentEventList(status)
+	 status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
+*/
+func CreateCurrentEventList(
+	status int,
+) (
 	top *OngoingEvent,
 	err error,
 ) {
@@ -41,7 +48,7 @@ func CreateCurrentEventList() (
 	top = new(OngoingEvent)
 	top.TimeNow = time.Now().Unix()
 
-	top.Eventlist, err = srapi.MakeEventListByApi(client)
+	top.Eventlist, err = srapi.MakeEventListByApi(client, status)
 	if err != nil {
 		err = fmt.Errorf("MakeListOfPoints(): %w", err)
 		log.Printf("MakeListOfPoints() returned error %s\n", err.Error())

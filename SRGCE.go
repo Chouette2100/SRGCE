@@ -171,6 +171,7 @@ http://localhost:8080/t008top
 	Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
 	Ver. 01AB02	最終結果取得済みのイベントをスキップする。
 	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
+	Ver. 01AD00	開催予定イベントの取得を行う。
 */
 package main
 
@@ -191,7 +192,7 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-const Version = "01AC00"
+const Version = "01AD00"
 
 func main() {
 
@@ -224,8 +225,26 @@ func main() {
 	srdblib.Tuser = "wuser"
 	srdblib.Tuserhistory = "wuserhistory"
 
-	//      現在開催中のイベントの一覧を求める。
-	cel, err := CreateCurrentEventList()
+	//	現在開催中のイベントの一覧を求める。
+	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
+	status := 1
+	cel, err := CreateCurrentEventList(status)
+	if err != nil {
+		log.Printf("GetCurrentEventList(): %s", err.Error())
+		return
+	}
+
+	//	取得したイベント情報をデータベースに格納する。
+	err = IntegrateNewEventlistToEventtable(cel.Eventlist)
+	if err != nil {
+		log.Printf("InsertIntoEvent(): %s", err.Error())
+		return
+	}
+
+	//	開催予定のイベントの一覧を求める。
+	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
+	status = 3
+	cel, err = CreateCurrentEventList(status)
 	if err != nil {
 		log.Printf("GetCurrentEventList(): %s", err.Error())
 		return
