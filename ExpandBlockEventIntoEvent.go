@@ -24,20 +24,26 @@ func ExpandBlockEventIntoEvent() (
 
 	for _, eid := range idofblockevent {
 
-		var blocklist []exsrapi.Block
-		blocklist, err = exsrapi.GetEventidOfBlockEvent(eid)
+		//	var blocklist []exsrapi.Block
+		//	blocklist, err = exsrapi.GetEventidOfBlockEvent(eid)
+		var blockinflist exsrapi.BlockInfList
+		blockinflist, err = exsrapi.GetEventidOfBlockEvent(eid)
 		if err != nil {
 			err = fmt.Errorf("exsrapi.GetEventidOfEventBox(): %w", err)
 			return
 		}
 
-		if len(blocklist) == 0 {
+		//	if len(blocklist) == 0 {
+		if len(blockinflist) == 0 {
 			//	子のイベントが検出できていない。
 			log.Printf("** ブロックイベントの子のイベントが検出できません。 eventid=%s\n", eid)
 			continue
 		}
 
 		eventinflist := make([]exsrapi.Event_Inf, 0)
+		for _, blockinf := range blockinflist {
+			blockname := blockinf.Show_rank_label
+			blocklist := blockinf.Block_list
 		for _, block := range blocklist {
 			var eventinf exsrapi.Event_Inf
 			blockid := fmt.Sprintf("%d", block.Block_id)
@@ -48,10 +54,11 @@ func ExpandBlockEventIntoEvent() (
 				//	return fmt.Errorf("GetEventinf(): %v", status)
 			} else {
 				eventinf.Event_ID = eidb
-				eventinf.Event_name += "[" + block.Label + "](" + blockid + ")"
+				eventinf.Event_name += "[" + blockname + "][" + block.Label + "](" + blockid + ")"
 				eventinflist = append(eventinflist, eventinf)
 			}
 		}
+	}
 		err = srdblib.InsertEventinflistToEvent(&eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)

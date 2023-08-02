@@ -165,13 +165,6 @@ C:\Users\chouette\go\src\t008srapi>t008srapi
 http://localhost:8080/t008top
 
 で、実行時点でのイベントの一覧が表示されます。
-
-	Ver. 01AA00	基本的動作を確認する。
-	Ver. 01AB00	進捗状況の表示をuserの更新基準からeventuserの更新基準に変更する。
-	Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
-	Ver. 01AB02	最終結果取得済みのイベントをスキップする。
-	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
-	Ver. 01AD00	開催予定イベントの取得を行う。
 */
 package main
 
@@ -192,7 +185,16 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-const Version = "01AD00"
+/*
+	Ver. 01AA00	基本的動作を確認する。
+	Ver. 01AB00	進捗状況の表示をuserの更新基準からeventuserの更新基準に変更する。
+	Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
+	Ver. 01AB02	最終結果取得済みのイベントをスキップする。
+	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
+	Ver. 01AD00	開催予定イベントの取得を行う。
+	Ver. 01AD01	ブロックイベントで最初の階層が複数のもので展開が正しくできるようにする。
+*/
+const Version = "01AD01"
 
 func main() {
 
