@@ -23,7 +23,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	var stmts, stmtu *sql.Stmt
 
 	//	既存データの変化をチェックする必要があるカラムの抽出用SQL
-	sqls := "select endtime, noentry, achk from " + srdblib.Tevent + " where eventid = ?"
+	sqls := "select endtime, period, noentry, achk from " + srdblib.Tevent + " where eventid = ?"
 	stmts, srdblib.Dberr = srdblib.Db.Prepare(sqls)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("Prepare(sqls): %w", srdblib.Dberr)
@@ -32,7 +32,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	defer stmts.Close()
 
 	//	データが変更されたカラムの更新用SQL
-	sqlu := "UPDATE " + srdblib.Tevent + " SET endtime = ?, noentry = ?, achk = ? WHERE eventid = ?"
+	sqlu := "UPDATE " + srdblib.Tevent + " SET endtime = ?, period = ?, noentry = ?, achk = ? WHERE eventid = ?"
 	stmtu, srdblib.Dberr = srdblib.Db.Prepare(sqlu)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("Prepare(sqlu): %w", srdblib.Dberr)
@@ -42,9 +42,10 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 
 	var endtime time.Time
 	var noentry, achk int
+	var period string
 	for i, eventinf := range eventinflist {
 		//	存在確認
-		srdblib.Dberr = stmts.QueryRow(eventinf.Event_ID).Scan(&endtime, &noentry, &achk)
+		srdblib.Dberr = stmts.QueryRow(eventinf.Event_ID).Scan(&endtime, &period, &noentry, &achk)
 		switch {
 		case srdblib.Dberr == sql.ErrNoRows:
 			//	存在しない。
@@ -62,6 +63,11 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 			} else {
 				reason += " "
 			}
+			if eventinf.Period != period {
+				reason += "P"
+			} else {
+				reason += " "
+			}
 			if eventinf.NoEntry != noentry {
 				reason += "N"
 			} else {
@@ -72,13 +78,13 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 			} else {
 				reason += " "
 			}
-			if reason != "   " {
+			if reason != "    " {
 				if eventinf.Achk%4 == achk {
-					//	ここでこの条件が成り立つのはendtime, noentry が変化したケースでイベントグループの子イベントの登録が終わっている場合。
+					//	ここでこの条件が成り立つのはendtime, noentry, period が変化したケースでイベントグループの子イベントの登録が終わっている場合。
 					//	その場合子イベントの登録状態（achk < 4)を変更してはならない。
 					eventinf.Achk = achk
 				}
-				stmtu.Exec(eventinf.End_time, eventinf.NoEntry, eventinf.Achk, eventinf.Event_ID)
+				stmtu.Exec(eventinf.End_time, eventinf.Period, eventinf.NoEntry, eventinf.Achk, eventinf.Event_ID)
 				log.Printf("  **Updated[%s]: %-30s %s\n", reason, eventinf.Event_ID, eventinf.Event_name)
 
 			} else {

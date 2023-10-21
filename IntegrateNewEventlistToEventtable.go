@@ -21,7 +21,7 @@ func IntegrateNewEventlistToEventtable(eventlist []srapi.Event) (
 
 	err = StoreEventinflistInEvent(eventinflist)
 	if err != nil {
-		log.Printf("InsertEventinflistToEvent(): %s", err.Error())
+		log.Printf("StoreEventinflistInEvent(): %s", err.Error())
 		return
 	}
 

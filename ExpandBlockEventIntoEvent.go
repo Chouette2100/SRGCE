@@ -34,14 +34,14 @@ func ExpandBlockEventIntoEvent() (
 		}
 
 		//	if len(blocklist) == 0 {
-		if len(blockinflist) == 0 {
+		if len(blockinflist.Blockinf) == 0 {
 			//	子のイベントが検出できていない。
 			log.Printf("** ブロックイベントの子のイベントが検出できません。 eventid=%s\n", eid)
 			continue
 		}
 
 		eventinflist := make([]exsrapi.Event_Inf, 0)
-		for _, blockinf := range blockinflist {
+		for _, blockinf := range blockinflist.Blockinf {
 			blockname := blockinf.Show_rank_label
 			blocklist := blockinf.Block_list
 		for _, block := range blocklist {

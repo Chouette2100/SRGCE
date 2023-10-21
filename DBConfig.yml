@@ -5,9 +5,12 @@
 ## DBサーバーのホスト名、指定しなければlocalhost
 #DBhost:
 # データベース名
-DBname:	${DBNAME}
+#DBname: ${DBNAME}
+DBname: showroom
+DBport: 3306
+#DBport: 8306
 #
 #
 # ログイン名とパスワードは環境変数で渡す
 DBuser:	${DBUSER}
-DBpswd:	${DBPW}
+DBpswd: ${DBPW}

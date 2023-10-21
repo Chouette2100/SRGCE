@@ -193,8 +193,9 @@ import (
 	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
 	Ver. 01AD00	開催予定イベントの取得を行う。
 	Ver. 01AD01	ブロックイベントで最初の階層（＝ランク？）が複数のもので展開が正しくできるようにする。
+	Ver. 01AE00	Periodを生成しweventテーブルに格納する。
 */
-const Version = "01AD01"
+const Version = "01AE00"
 
 func main() {
 
