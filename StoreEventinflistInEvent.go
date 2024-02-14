@@ -59,21 +59,25 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 			//	存在する。endtime、achkが違うならupdateする。
 			reason := ""
 			if eventinf.End_time.Sub(endtime)  < time.Second * -1 || eventinf.End_time.Sub(endtime) > time.Second{
+				//	終了時刻が変更された。
 				reason += "E"
 			} else {
 				reason += " "
 			}
 			if eventinf.Period != period {
+				//	期間が変更（修正）された。
 				reason += "P"
 			} else {
 				reason += " "
 			}
 			if eventinf.NoEntry != noentry {
+				//	イベント参加者数が変化した。
 				reason += "N"
 			} else {
 				reason += " "
 			}
 			if eventinf.Achk%4 != achk {
+				//	イベント種別（ブロックイベント、イベントボックス、それら以外）が変化した。
 				reason += "A"
 			} else {
 				reason += " "
@@ -81,13 +85,14 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 			if reason != "    " {
 				if eventinf.Achk%4 == achk {
 					//	ここでこの条件が成り立つのはendtime, noentry, period が変化したケースでイベントグループの子イベントの登録が終わっている場合。
-					//	その場合子イベントの登録状態（achk < 4)を変更してはならない。
+					//	その場合子イベントの登録状態（achk < 4)を変更してはならない。Achkを現在の状態に戻してから保存する。
 					eventinf.Achk = achk
 				}
 				stmtu.Exec(eventinf.End_time, eventinf.Period, eventinf.NoEntry, eventinf.Achk, eventinf.Event_ID)
 				log.Printf("  **Updated[%s]: %-30s %s\n", reason, eventinf.Event_ID, eventinf.Event_name)
 
 			} else {
+				//	イベント状態に変化がない。
 				log.Printf("  **Ignored: %-30s %s\n", eventinf.Event_ID, eventinf.Event_name)
 			}
 		}
