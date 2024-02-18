@@ -59,7 +59,7 @@ func ExpandBlockEventIntoEvent() (
 			}
 		}
 	}
-		err = srdblib.InsertEventinflistToEvent(&eventinflist, true)
+		err = srdblib.InsertEventinflistToEvent(srdblib.Tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return

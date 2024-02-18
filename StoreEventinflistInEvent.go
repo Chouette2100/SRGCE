@@ -99,7 +99,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	}
 
 	if len(eventinflist) != 0 {
-		err = srdblib.InsertEventinflistToEvent(&eventinflist, false)
+		err = srdblib.InsertEventinflistToEvent(srdblib.Tevent, &eventinflist, false)
 		if err != nil {
 			err = fmt.Errorf("InsertEventinflistToEvent(): %w", srdblib.Dberr)
 			return
