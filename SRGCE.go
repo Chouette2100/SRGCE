@@ -195,8 +195,10 @@ import (
 	Ver. 01AD01	ブロックイベントで最初の階層（＝ランク？）が複数のもので展開が正しくできるようにする。
 	Ver. 01AE00	Periodを生成しweventテーブルに格納する。
 	Ver. 01AF00	srdblib.InsertEventinflistToEven()の引数にイベント名が追加されたことに対応する。
+	Ver. 01AG00	ExpandBlockEventIntoEvent() 子イベントの展開中のエラーは次のブロックイベントの展開にスキップする。
+				exsrapi.GetEventidOfBlockEvent() 子イベントのブロックIDへのセレクタ−を変更する。
 */
-const Version = "01AF00"
+const Version = "01AG00"
 
 func main() {
 

@@ -30,7 +30,8 @@ func ExpandBlockEventIntoEvent() (
 		blockinflist, err = exsrapi.GetEventidOfBlockEvent(eid)
 		if err != nil {
 			err = fmt.Errorf("exsrapi.GetEventidOfEventBox(): %w", err)
-			return
+			//	return
+			continue
 		}
 
 		//	if len(blocklist) == 0 {
