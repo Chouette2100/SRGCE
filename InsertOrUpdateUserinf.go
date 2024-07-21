@@ -14,7 +14,11 @@ import (
 )
 
 func InsertIntoOrUpdateUser(
-	tnow time.Time, eventid string, roominf exsrapi.RoomInfo,
+	tuser string,
+	tuserhistory string,
+	tnow time.Time,
+	eventid string,
+	roominf exsrapi.RoomInfo,
 ) (
 	err error,
 ) {
@@ -26,7 +30,7 @@ func InsertIntoOrUpdateUser(
 
 	//	レコードがすでに存在するか？
 	nrow := 0
-	err = srdblib.Db.QueryRow("select count(*) from " + srdblib.Tuser + " where userno =" + roominf.ID).Scan(&nrow)
+	err = srdblib.Db.QueryRow("select count(*) from " + tuser + " where userno =" + roominf.ID).Scan(&nrow)
 
 	if err != nil {
 		err = fmt.Errorf("QueryRow(): %w", err)
@@ -51,7 +55,7 @@ func InsertIntoOrUpdateUser(
 		//	log.Printf("insert into " + srdblib.Tuserhistory + "(*new*) userno=%d rank=<%s> nrank=<%s> prank=<%s> level=%d, followers=%d, fans=%d, fans_lst=%d\n",
 		//		userno, roominf.Rank, roominf.Nrank, roominf.Prank, roominf.Level, roominf.Followers, fans, fans_lst)
 
-		sqli := "INSERT INTO " + srdblib.Tuser + " (userno, userid, user_name, longname, shortname, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts, currentevent)"
+		sqli := "INSERT INTO " + tuser + " (userno, userid, user_name, longname, shortname, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts, currentevent)"
 		sqli += " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 		//	log.Printf("sql=%s\n", sql)
@@ -111,7 +115,7 @@ func InsertIntoOrUpdateUser(
 		}
 	} else {
 		//	存在する。
-		sqls := "select user_name, genre, `rank`, nrank, prank, level, followers, fans, fans_lst from " + srdblib.Tuser + "  where userno = ?"
+		sqls := "select user_name, genre, `rank`, nrank, prank, level, followers, fans, fans_lst from " + tuser + "  where userno = ?"
 		err = srdblib.Db.QueryRow(sqls, userno).Scan(&name, &genre, &rank, &nrank, &prank, &level, &followers, &fans, &fans_lst)
 		if err != nil {
 			log.Printf("err=[%s]\n", err.Error())
@@ -131,7 +135,7 @@ func InsertIntoOrUpdateUser(
 
 			//	log.Printf("insert into userhistory(*changed*) userno=%d level=%d, followers=%d, fans=%d\n",
 			//		userno, roominf.Level, roominf.Followers, roominf.Fans)
-			sqlu := "update " + srdblib.Tuser + " set userid=?,"
+			sqlu := "update " + tuser + " set userid=?,"
 			sqlu += "user_name=?,"
 			sqlu += "genre=?,"
 			sqlu += "`rank`=?,"
@@ -183,7 +187,7 @@ func InsertIntoOrUpdateUser(
 	}
 
 	if isnew {
-		sqli := "INSERT INTO " + srdblib.Tuserhistory + "(userno, user_name, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts)"
+		sqli := "INSERT INTO " + tuserhistory + "(userno, user_name, genre, `rank`, nrank, prank, level, followers, fans, fans_lst, ts)"
 		sqli += " VALUES(?,?,?,?,?,?,?,?,?,?,?)"
 		//	log.Printf("sql=%s\n", sql)
 		var stmti *sql.Stmt

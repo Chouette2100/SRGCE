@@ -7,14 +7,16 @@ import (
 	"log"
 )
 
-func ExpandEventBoxIntoEvent() (
+func ExpandEventBoxIntoEvent(
+	tevent string,
+) (
 	err error,
 ) {
 
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
 
-	idofeventbox, err := ExtractIDofEventGroup(EventBox)
+	idofeventbox, err := ExtractIDofEventGroup(tevent, EventBox)
 	if err != nil {
 		err = fmt.Errorf("GetIDofEventbox(): %w", err)
 		return
@@ -47,12 +49,12 @@ func ExpandEventBoxIntoEvent() (
 			}
 		}
 
-		err = srdblib.InsertEventinflistToEvent(srdblib.Tevent, &eventinflist, true)
+		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return
 		}
-		_, err = srdblib.Db.Exec("UPDATE " + srdblib.Tevent + " SET achk = ? where eventid = ?", EventBox % 4, eid)
+		_, err = srdblib.Db.Exec("UPDATE " + tevent + " SET achk = ? where eventid = ?", EventBox % 4, eid)
 		log.Printf("  %s is Event Box. Number of Child Event is %d\n", eid, len(eventinflist))
 
 	}

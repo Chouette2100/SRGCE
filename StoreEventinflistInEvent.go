@@ -13,7 +13,10 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
+func StoreEventinflistInEvent(
+	tevent string,
+	eventinflist []exsrapi.Event_Inf,
+	) (
 	err error,
 ) {
 
@@ -23,7 +26,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	var stmts, stmtu *sql.Stmt
 
 	//	既存データの変化をチェックする必要があるカラムの抽出用SQL
-	sqls := "select endtime, period, noentry, achk from " + srdblib.Tevent + " where eventid = ?"
+	sqls := "select endtime, period, noentry, achk from " + tevent + " where eventid = ?"
 	stmts, srdblib.Dberr = srdblib.Db.Prepare(sqls)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("Prepare(sqls): %w", srdblib.Dberr)
@@ -32,7 +35,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	defer stmts.Close()
 
 	//	データが変更されたカラムの更新用SQL
-	sqlu := "UPDATE " + srdblib.Tevent + " SET endtime = ?, period = ?, noentry = ?, achk = ? WHERE eventid = ?"
+	sqlu := "UPDATE " + tevent + " SET endtime = ?, period = ?, noentry = ?, achk = ? WHERE eventid = ?"
 	stmtu, srdblib.Dberr = srdblib.Db.Prepare(sqlu)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("Prepare(sqlu): %w", srdblib.Dberr)
@@ -99,7 +102,7 @@ func StoreEventinflistInEvent(eventinflist []exsrapi.Event_Inf) (
 	}
 
 	if len(eventinflist) != 0 {
-		err = srdblib.InsertEventinflistToEvent(srdblib.Tevent, &eventinflist, false)
+		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, false)
 		if err != nil {
 			err = fmt.Errorf("InsertEventinflistToEvent(): %w", srdblib.Dberr)
 			return

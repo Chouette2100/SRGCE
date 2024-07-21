@@ -9,14 +9,16 @@ import (
 	"github.com/Chouette2100/srdblib"
 )
 
-func ExpandBlockEventIntoEvent() (
+func ExpandBlockEventIntoEvent(
+	tevent string,
+) (
 	err error,
 ) {
 
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
 
-	idofblockevent, err := ExtractIDofEventGroup(BlockEvent)
+	idofblockevent, err := ExtractIDofEventGroup(tevent, BlockEvent)
 	if err != nil {
 		err = fmt.Errorf("SelectIDofEventGroup(BlockEvent): %w", err)
 		return
@@ -60,12 +62,12 @@ func ExpandBlockEventIntoEvent() (
 			}
 		}
 	}
-		err = srdblib.InsertEventinflistToEvent(srdblib.Tevent, &eventinflist, true)
+		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return
 		}
-		_, err = srdblib.Db.Exec("UPDATE "+srdblib.Tevent+" SET achk = ? where eventid = ?", BlockEvent%4, eid)
+		_, err = srdblib.Db.Exec("UPDATE "+tevent+" SET achk = ? where eventid = ?", BlockEvent%4, eid)
 		log.Printf("  %s is BlockEvent. Number of Child Event is %d\n", eid, len(eventinflist))
 
 	}

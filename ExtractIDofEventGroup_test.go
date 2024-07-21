@@ -47,14 +47,14 @@ func TestExtractIDofEventGroup(t *testing.T) {
 	defer srdblib.Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
-	srdblib.Tevent = "wevent"
-	srdblib.Teventuser = "weventuser"
-	srdblib.Tuser = "wuser"
-	srdblib.Tuserhistory = "wuserhistory"
+	//	srdblib.Tevent = "wevent"
+	//	srdblib.Teventuser = "weventuser"
+	//	srdblib.Tuser = "wuser"
+	//	srdblib.Tuserhistory = "wuserhistory"
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotIdofeventbox, err := ExtractIDofEventGroup(EventBox)
+			gotIdofeventbox, err := ExtractIDofEventGroup("wevent", EventBox)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAndInsertEventBox() error = %v, wantErr %v", err, tt.wantErr)
 				return

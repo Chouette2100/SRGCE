@@ -3,17 +3,34 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
+	//	"strings"
 	"time"
 
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi"
+	"github.com/Chouette2100/srapi"
 	"github.com/Chouette2100/srdblib"
 )
 
-func CollectRoominfFromEndEvent() (
+type Uinf struct {
+	Userno   int
+	Username string
+	Point    int
+	Rank     int
+}
+
+// 結果が発表されたイベントの順位と獲得ポイントを取得する
+// これはイベント終了日の翌日12時から翌々日12時までのあいだに行う必要がある)
+// 前日終了のイベントのデータを取得するか、前々日のものを取得するかは実行時刻に応じて判断される。
+func CollectRoominfFromEndEvent(
+	tevent string,
+	teventuser string,
+	tuser string,
+	tuserhistory string,
+) (
 	err error,
 ) {
 
@@ -40,26 +57,28 @@ func CollectRoominfFromEndEvent() (
 	//	特にg時まではtnow.Truncate(24 * time.Hour)の結果は1日前になることに注意
 	var tday1, tday2 time.Time
 	if hh < 9 {
-		//	12時までは前々日に終了したイベントの結果が表示されている(上記コメント参照)
+		//	12時までは前々日に終了したイベントの結果が表示されるが、9時までは前日相当となる。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
 	} else if hh < 12 {
 		//	12時までは前々日に終了したイベントの結果が表示されている。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-57 * time.Hour)
+		//	tday1 = tnow.Truncate(24 * time.Hour).Add(-153 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
 	} else {
 		//	12時をすぎると前日に終了したイベントの結果が表示される。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
+		//	tday1 = tnow.Truncate(24 * time.Hour).Add(-139 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
 	}
 	log.Printf("tday:  %s\n", tnow.Format("2006-01-02 15:04:05 MST"))
 	log.Printf("tday1: %s\n", tday1.Format("2006-01-02 15:04:05 MST"))
 	log.Printf("tday2: %s\n", tday2.Format("2006-01-02 15:04:05 MST"))
 
-	sqlstmt := "select eventid from " + srdblib.Tevent + " where achk = 0 and endtime > ? and endtime < ?"
+	sqlstmt := "select eventid from " + tevent + " where achk = 0 and endtime > ? and endtime < ?"
 	stmt, srdblib.Dberr = srdblib.Db.Prepare(sqlstmt)
 	if srdblib.Dberr != nil {
-		err = fmt.Errorf("row.Priepare(): %w", srdblib.Dberr)
+		err = fmt.Errorf("srdblib.Db.Prepare(): %w", srdblib.Dberr)
 		return
 	}
 	defer stmt.Close()
@@ -73,55 +92,93 @@ func CollectRoominfFromEndEvent() (
 
 	idofevent := make([]string, 0)
 
-	id := ""
+	eid := ""
 	for rows.Next() {
-		srdblib.Dberr = rows.Scan(&id)
+		srdblib.Dberr = rows.Scan(&eid)
 		if srdblib.Dberr != nil {
 			err = fmt.Errorf("rows.Scan(): %w", srdblib.Dberr)
 			return
 		}
-		idofevent = append(idofevent, id)
+		idofevent = append(idofevent, eid)
 	}
 
 	log.Printf("==================================\n")
-	for _, id := range idofevent {
-		log.Printf("eventid: %s\n", id)
+	for _, eid = range idofevent {
+		log.Printf("eventid: %s\n", eid)
 
 		//	取得すべきデータの存在チェック（取得済みかのチェック）
 		nrow := 0
-		sqlsc := "select count(*) from " + srdblib.Teventuser + " where eventid = ?"
-		srdblib.Db.QueryRow(sqlsc, id).Scan(&nrow)
+		sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
+		srdblib.Db.QueryRow(sqlsc, eid).Scan(&nrow)
 		if nrow > 0 {
 			//	取得済み
 			log.Printf("    data exists. skip.\n")
 			continue
 		}
 
-		var eventinf exsrapi.Event_Inf
-		var roominfolist exsrapi.RoomInfoList
-		if !strings.Contains(id, "?") {
-			exsrapi.GetEventinfAndRoomList(id, 1, 30, &eventinf, &roominfolist)
-		} else {
-			exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
+		//	イベントの詳細を得る、ここではIeventidが必要である
+		row, err := srdblib.Dbmap.Get(srdblib.Event{}, eid)
+		if err != nil {
+			err = fmt.Errorf("Dbmap.Get(): %w", err)
+			return err
 		}
-		for _, room := range roominfolist {
+		event := row.(*srdblib.Event)
+
+		//	イベントに参加しているルームを取得する
+		roomlistinf, err := srapi.GetRoominfFromEventByApi(client, event.Ieventid, 1, 1)
+		if err != nil {
+			err = fmt.Errorf("GetRoominfFromEventByApi(): %w", err)
+			return err
+		}
+		roomid := roomlistinf.RoomList[0].Room_id
+
+		//	イベント結果を取得する
+		pranking, err := srapi.ApiEventsRanking(client, (event).Ieventid, roomid, 0)
+		if err != nil {
+			err = fmt.Errorf("ApiEventsRanking(): %w", err)
+			return err
+		}
+
+		uinflist := make([]Uinf, 0)
+
+		if len(pranking.Ranking) != 0 {
+			for _, ranking := range pranking.Ranking {
+				uinflist = append(uinflist, Uinf{Userno: ranking.Room.RoomID, Username: ranking.Room.Name, Point: ranking.Point, Rank: ranking.Rank})
+			}
+		} else {
+			var eventinf exsrapi.Event_Inf
+			var roominfolist exsrapi.RoomInfoList
+			//	if !strings.Contains(id, "?") {
+			exsrapi.GetEventinfAndRoomList(eid, 1, 30, &eventinf, &roominfolist)
+			//	} else {
+			//		exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
+			//	}
+			for _, roominf := range roominfolist {
+				uinflist = append(uinflist, Uinf{Userno: roominf.Userno, Username: roominf.Name, Point: roominf.Point, Rank: roominf.Irank})
+			}
+		}
+
+		for _, uinf := range uinflist {
 			status := ""
-			status, err = CreateEventuserFromEventinf(eventinf.Event_ID, room)
+			status, err = CreateEventuserFromEventinf(teventuser, eid, uinf)
 			if err != nil {
 				err = fmt.Errorf("CreateEventuserFromEventinf(): %w", err)
 				status = "**error"
-				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, room.Account, room.Userno, room.Irank, room.Point, eventinf.Event_ID)
-				return
+				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
+				return err
 			} else {
-				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, room.Account, room.Userno, room.Irank, room.Point, eventinf.Event_ID)
+				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
 				if status == "ignored." {
 					continue
 				}
 			}
-			err = InsertIntoOrUpdateUser(tnow, eventinf.Event_ID, room)
+			//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
+			wuser := new(srdblib.Wuser)
+			wuser.Userno = uinf.Userno
+			err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440, 5)
 			if err != nil {
 				err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
-				return
+				return err
 			}
 		}
 	}

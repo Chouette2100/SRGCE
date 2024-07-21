@@ -15,6 +15,7 @@ const EventBox = 6
 const BlockEvent = 5
 
 func ExtractIDofEventGroup(
+	tevent string,
 	mode int,
 ) (
 	idofeventgroup []string,
@@ -27,7 +28,7 @@ func ExtractIDofEventGroup(
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 
-	sqlstmt := "select eventid from " + srdblib.Tevent + " where achk = ?"
+	sqlstmt := "select eventid from " + tevent + " where achk = ?"
 	stmt, srdblib.Dberr = srdblib.Db.Prepare(sqlstmt)
 	if srdblib.Dberr != nil {
 		err = fmt.Errorf("row.Priepare(): %w", srdblib.Dberr)

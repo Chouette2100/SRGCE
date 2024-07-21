@@ -9,6 +9,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/go-gorp/gorp"
+
 	"github.com/Chouette2100/srdblib"
 	"github.com/Chouette2100/exsrapi"
 )
@@ -47,15 +49,21 @@ func TestCollectRoominfFromEndEvent(t *testing.T) {
 
 	log.Printf("dbconfig=%v\n",	dbconfig)
 
-	srdblib.Tevent = "wevent"
-	srdblib.Teventuser = "weventuser"
-	srdblib.Tuser = "wuser"
-	srdblib.Tuserhistory = "wuserhistory"
+	//	srdblib.Tevent = "wevent"
+	//	srdblib.Teventuser = "weventuser"
+	//	srdblib.Tuser = "wuser"
+	//	srdblib.Tuserhistory = "wuserhistory"
 
+	dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
+	srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
+	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
+	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
+	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CollectRoominfFromEndEvent(); (err != nil) != tt.wantErr {
+			if err := CollectRoominfFromEndEvent("wevent", "weventuser", "wuser", "wuserhistory"); (err != nil) != tt.wantErr {
 				t.Errorf("GetRoominfAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

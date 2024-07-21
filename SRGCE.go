@@ -181,6 +181,8 @@ import (
 	//	"database/sql"
 	//	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/go-gorp/gorp"
+
 	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srdblib"
 )
@@ -197,8 +199,11 @@ import (
 	Ver. 01AF00	srdblib.InsertEventinflistToEven()の引数にイベント名が追加されたことに対応する。
 	Ver. 01AG00	ExpandBlockEventIntoEvent() 子イベントの展開中のエラーは次のブロックイベントの展開にスキップする。
 				exsrapi.GetEventidOfBlockEvent() 子イベントのブロックIDへのセレクタ−を変更する。
+	Ver. 01AH00	srdblib.Tevent の形を tevent として引数で引き継ぐようにする。
+	Ver. 01AJ00	gorpを導入する。イベント最終結果の取得にsrapi.ApiEventsRanking()を使う。
+	Ver. 01AJ01 srapi.ApiEventsRanking()で結果が得られないときi(=レベルイベント)はexsrapi.GetEventinfAndRoomList()を使う
 */
-const Version = "01AG00"
+const Version = "01AJ01"
 
 func main() {
 
@@ -226,10 +231,18 @@ func main() {
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
 	//      テーブルは"w"で始まるものを操作の対象とする。
-	srdblib.Tevent = "wevent"
-	srdblib.Teventuser = "weventuser"
-	srdblib.Tuser = "wuser"
-	srdblib.Tuserhistory = "wuserhistory"
+	//	srdblib.Tevent = "wevent"
+	//	srdblib.Teventuser = "weventuser"
+	//	srdblib.Tuser = "wuser"
+	//	srdblib.Tuserhistory = "wuserhistory"
+
+	dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
+	srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
+	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
+	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
+	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+
 
 	//	現在開催中のイベントの一覧を求める。
 	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
@@ -241,7 +254,7 @@ func main() {
 	}
 
 	//	取得したイベント情報をデータベースに格納する。
-	err = IntegrateNewEventlistToEventtable(cel.Eventlist)
+	err = IntegrateNewEventlistToEventtable("wevent", cel.Eventlist)
 	if err != nil {
 		log.Printf("InsertIntoEvent(): %s", err.Error())
 		return
@@ -257,20 +270,20 @@ func main() {
 	}
 
 	//	取得したイベント情報をデータベースに格納する。
-	err = IntegrateNewEventlistToEventtable(cel.Eventlist)
+	err = IntegrateNewEventlistToEventtable("wevent", cel.Eventlist)
 	if err != nil {
 		log.Printf("InsertIntoEvent(): %s", err.Error())
 		return
 	}
 
 	//	ブロックイベントを展開する。
-	err = ExpandBlockEventIntoEvent()
+	err = ExpandBlockEventIntoEvent("wevent")
 	if err != nil {
 		log.Printf("InsertBlockeventToEvent(): %s", err.Error())
 	}
 
 	//	イベントボックスを展開する。
-	err = ExpandEventBoxIntoEvent()
+	err = ExpandEventBoxIntoEvent("wevent")
 	if err != nil {
 		log.Printf("InsertEventBoxToWevent(): %s", err.Error())
 	}
@@ -278,6 +291,9 @@ func main() {
 	//	結果が発表されたイベントの順位と獲得ポイントを取得する
 	//	これはイベント終了日の翌日12時から翌々日12時までのあいだに行う必要がある)
 	//	前日終了のイベントのデータを取得するか、前々日のものを取得するかは実行時刻に応じて判断される。
-	CollectRoominfFromEndEvent()
+	err = CollectRoominfFromEndEvent("wevent", "weventuser", "wuser", "wuserhistory")
+	if err != nil {
+		log.Printf("  CollectRoominfFromEndEvent() returned err=%s\n", err.Error())
+	}
 
 }

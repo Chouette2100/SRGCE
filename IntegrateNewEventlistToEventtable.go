@@ -7,7 +7,10 @@ import (
 	"github.com/Chouette2100/srapi"
 )
 
-func IntegrateNewEventlistToEventtable(eventlist []srapi.Event) (
+func IntegrateNewEventlistToEventtable(
+	tevent string,
+	eventlist []srapi.Event,
+	) (
 	err error,
 ) {
 
@@ -19,7 +22,7 @@ func IntegrateNewEventlistToEventtable(eventlist []srapi.Event) (
 		eventinflist = append(eventinflist, *exsrapi.ConvertEventToEventinf(&event))
 	}
 
-	err = StoreEventinflistInEvent(eventinflist)
+	err = StoreEventinflistInEvent(tevent, eventinflist)
 	if err != nil {
 		log.Printf("StoreEventinflistInEvent(): %s", err.Error())
 		return
