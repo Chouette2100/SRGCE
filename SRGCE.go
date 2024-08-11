@@ -202,8 +202,9 @@ import (
 	Ver. 01AH00	srdblib.Tevent の形を tevent として引数で引き継ぐようにする。
 	Ver. 01AJ00	gorpを導入する。イベント最終結果の取得にsrapi.ApiEventsRanking()を使う。
 	Ver. 01AJ01 srapi.ApiEventsRanking()で結果が得られないときi(=レベルイベント)はexsrapi.GetEventinfAndRoomList()を使う
+	Ver. 01AK01 CollectRoominfFromEndEvent()にてブロックイベントの結果の取得方法を正す（block_idを指定する）
 */
-const Version = "01AJ01"
+const Version = "01AK01"
 
 func main() {
 

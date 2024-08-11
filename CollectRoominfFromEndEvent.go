@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	//	"strings"
+	"strings"
+	"strconv"
 	"time"
 
 	"database/sql"
@@ -68,7 +69,7 @@ func CollectRoominfFromEndEvent(
 	} else {
 		//	12時をすぎると前日に終了したイベントの結果が表示される。
 		tday1 = tnow.Truncate(24 * time.Hour).Add(-33 * time.Hour)
-		//	tday1 = tnow.Truncate(24 * time.Hour).Add(-139 * time.Hour)
+		//	day1 = tnow.Truncate(24 * time.Hour).Add(-57 * time.Hour)
 		tday2 = tnow.Truncate(24 * time.Hour).Add(-9 * time.Hour)
 	}
 	log.Printf("tday:  %s\n", tnow.Format("2006-01-02 15:04:05 MST"))
@@ -133,7 +134,12 @@ func CollectRoominfFromEndEvent(
 		roomid := roomlistinf.RoomList[0].Room_id
 
 		//	イベント結果を取得する
-		pranking, err := srapi.ApiEventsRanking(client, (event).Ieventid, roomid, 0)
+		bid := 0
+		if strings.Contains(event.Eventid, "block_id") {
+			eida := strings.Split(event.Eventid, "=")
+			bid, _ = strconv.Atoi(eida[1])
+		}
+		pranking, err := srapi.ApiEventsRanking(client, (event).Ieventid, roomid, bid)
 		if err != nil {
 			err = fmt.Errorf("ApiEventsRanking(): %w", err)
 			return err
