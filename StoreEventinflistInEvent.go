@@ -47,6 +47,10 @@ func StoreEventinflistInEvent(
 	var noentry, achk int
 	var period string
 	for i, eventinf := range eventinflist {
+		if eventinf.Event_ID == "safaripark_showroom" {
+			//	block_id=0 が存在することに対する一時的回避処理
+			continue
+		}
 		//	存在確認
 		srdblib.Dberr = stmts.QueryRow(eventinf.Event_ID).Scan(&endtime, &period, &noentry, &achk)
 		switch {
