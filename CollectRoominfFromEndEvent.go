@@ -107,6 +107,8 @@ func CollectRoominfFromEndEvent(
 	for _, eid = range idofevent {
 		log.Printf("eventid: %s\n", eid)
 
+		// =============================================== ここから　CollectOneRoominfFromEndEvent()
+
 		//	取得すべきデータの存在チェック（取得済みかのチェック）
 		nrow := 0
 		sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
@@ -187,6 +189,8 @@ func CollectRoominfFromEndEvent(
 				return err
 			}
 		}
+
+		//	========================================================= ここまで CollectOneRoominfFromEndEvent()
 	}
 
 	return

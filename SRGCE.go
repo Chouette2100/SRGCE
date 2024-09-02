@@ -204,7 +204,7 @@ import (
 	Ver. 01AJ01 srapi.ApiEventsRanking()で結果が得られないときi(=レベルイベント)はexsrapi.GetEventinfAndRoomList()を使う
 	Ver. 01AK01 CollectRoominfFromEndEvent()にてブロックイベントの結果の取得方法を正す（block_idを指定する）
 	Ver. 01AL00 CollectOneRoominfFromEndEvent()を作成する
-	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する。
+	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
 */
 const Version = "01AL01"
 
