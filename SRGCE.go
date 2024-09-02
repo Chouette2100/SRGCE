@@ -205,8 +205,9 @@ import (
 	Ver. 01AK01 CollectRoominfFromEndEvent()にてブロックイベントの結果の取得方法を正す（block_idを指定する）
 	Ver. 01AL00 CollectOneRoominfFromEndEvent()を作成する
 	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
+	Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
 */
-const Version = "01AL01"
+const Version = "01AM00"
 
 func main() {
 
@@ -220,6 +221,17 @@ func main() {
 
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
+
+		//      cookiejarがセットされたHTTPクライアントを作る
+		client, jar, err := exsrapi.CreateNewClient("ShowroomCGI")
+		if err != nil {
+			log.Printf("CreateNewClient: %s\n", err.Error())
+			return
+		}
+		//      すべての処理が終了したらcookiejarを保存する。
+		defer jar.Save()
+	
+	
 
 	//      データベースとの接続をオープンする。
 	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
@@ -250,7 +262,7 @@ func main() {
 	//	現在開催中のイベントの一覧を求める。
 	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
 	status := 1
-	cel, err := CreateCurrentEventList(status)
+	cel, err := CreateCurrentEventList(client, status)
 	if err != nil {
 		log.Printf("GetCurrentEventList(): %s", err.Error())
 		return
@@ -266,7 +278,7 @@ func main() {
 	//	開催予定のイベントの一覧を求める。
 	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
 	status = 3
-	cel, err = CreateCurrentEventList(status)
+	cel, err = CreateCurrentEventList(client, status)
 	if err != nil {
 		log.Printf("GetCurrentEventList(): %s", err.Error())
 		return
@@ -294,7 +306,7 @@ func main() {
 	//	結果が発表されたイベントの順位と獲得ポイントを取得する
 	//	これはイベント終了日の翌日12時から翌々日12時までのあいだに行う必要がある)
 	//	前日終了のイベントのデータを取得するか、前々日のものを取得するかは実行時刻に応じて判断される。
-	err = CollectRoominfFromEndEvent("wevent", "weventuser", "wuser", "wuserhistory")
+	err = CollectRoominfFromEndEvent(client, "wevent", "weventuser", "wuser", "wuserhistory")
 	if err != nil {
 		log.Printf("  CollectRoominfFromEndEvent() returned err=%s\n", err.Error())
 	}

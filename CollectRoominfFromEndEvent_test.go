@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
 	"io"
 	"log"
+	"os"
 
 	"testing"
 
@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-gorp/gorp"
 
-	"github.com/Chouette2100/srdblib"
 	"github.com/Chouette2100/exsrapi"
+	"github.com/Chouette2100/srdblib"
 )
 
 func TestCollectRoominfFromEndEvent(t *testing.T) {
@@ -33,8 +33,16 @@ func TestCollectRoominfFromEndEvent(t *testing.T) {
 		return
 	}
 	defer logfile.Close()
-	log.SetOutput(io.MultiWriter(logfile,os.Stdout))
+	log.SetOutput(io.MultiWriter(logfile, os.Stdout))
 
+	//      cookiejarがセットされたHTTPクライアントを作る
+	client, jar, err := exsrapi.CreateNewClient("ShowroomCGI")
+	if err != nil {
+		log.Printf("CreateNewClient: %s\n", err.Error())
+		return
+	}
+	//      すべての処理が終了したらcookiejarを保存する。
+	defer jar.Save()
 
 	//      データベースとの接続をオープンする。
 	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
@@ -47,7 +55,7 @@ func TestCollectRoominfFromEndEvent(t *testing.T) {
 	}
 	defer srdblib.Db.Close()
 
-	log.Printf("dbconfig=%v\n",	dbconfig)
+	log.Printf("dbconfig=%v\n", dbconfig)
 
 	//	srdblib.Tevent = "wevent"
 	//	srdblib.Teventuser = "weventuser"
@@ -63,7 +71,7 @@ func TestCollectRoominfFromEndEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CollectRoominfFromEndEvent("wevent", "weventuser", "wuser", "wuserhistory"); (err != nil) != tt.wantErr {
+			if err := CollectRoominfFromEndEvent(client, "wevent", "weventuser", "wuser", "wuserhistory"); (err != nil) != tt.wantErr {
 				t.Errorf("GetRoominfAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

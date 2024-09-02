@@ -1,12 +1,15 @@
 package main
 
 import (
+	"net/http"
+
 	"reflect"
 	"testing"
 )
 
 func TestCreateCurrentEventList(t *testing.T) {
 	type args struct {
+		client *http.Client
 		status int
 	}
 	tests := []struct {
@@ -30,7 +33,7 @@ func TestCreateCurrentEventList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotTop, err := CreateCurrentEventList(tt.args.status)
+			gotTop, err := CreateCurrentEventList(tt.args.client, tt.args.status)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateCurrentEventList() error = %v, wantErr %v", err, tt.wantErr)
 				return

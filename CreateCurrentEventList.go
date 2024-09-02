@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 	//	"sort"
+	"net/http"
 
 	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srapi"
@@ -28,6 +29,7 @@ var Err error
 	 status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
 */
 func CreateCurrentEventList(
+	client *http.Client,
 	status int,
 ) (
 	top *OngoingEvent,
@@ -36,13 +38,6 @@ func CreateCurrentEventList(
 
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
-
-	client, cookiejar, err := exsrapi.CreateNewClient("")
-	if err != nil {
-		log.Printf("exsrapi.CeateNewClient(): %s", err.Error())
-		return //	エラーがあれば、ここで終了
-	}
-	defer cookiejar.Save()
 
 	// テンプレートに埋め込むデータ（ポイントやランク）を作成する
 	top = new(OngoingEvent)

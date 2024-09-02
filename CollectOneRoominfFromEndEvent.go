@@ -6,8 +6,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
+	//	"strconv"
+	//	"strings"
 	"time"
 
 	//	"database/sql"
@@ -16,7 +16,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi"
-	"github.com/Chouette2100/srapi"
+	//	"github.com/Chouette2100/srapi"
 	"github.com/Chouette2100/srdblib"
 )
 
@@ -52,6 +52,13 @@ func CollectOneRoominfFromEndEvent(
 
 	//	====================================== ここから GetEventsRankingByApi()
 
+	pranking, err := srdblib.GetEventsRankingByApi(client, eid, 2)
+	if err != nil {
+		err = fmt.Errorf("GetEventsRankingByApi(): %w", err)
+		return err
+	}
+
+	/*
 	// イベントの詳細を得る、ここではIeventidが必要である
 	row, err := srdblib.Dbmap.Get(srdblib.Event{}, eid)
 	if err != nil {
@@ -60,7 +67,8 @@ func CollectOneRoominfFromEndEvent(
 	}
 	event := row.(*srdblib.Event)
 
-	// イベントに参加しているルームを取得する
+	// イベントに参加しているルームを一つ取得する
+	//	(ApiEventsRanking()にはイベントIDとともにルームIDが必要だから)
 	roomlistinf, err := srapi.GetRoominfFromEventByApi(client, event.Ieventid, 1, 1)
 	if err != nil {
 		err = fmt.Errorf("GetRoominfFromEventByApi(): %w", err)
@@ -79,6 +87,7 @@ func CollectOneRoominfFromEndEvent(
 		err = fmt.Errorf("ApiEventsRanking(): %w", err)
 		return err
 	}
+	*/
 
 	//	====================================== ここまで GetEventsRankingByApi()
 
@@ -118,7 +127,7 @@ func CollectOneRoominfFromEndEvent(
 		//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
 		wuser := new(srdblib.Wuser)
 		wuser.Userno = uinf.Userno
-		err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440, 5)
+		err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440, 1000)
 		if err != nil {
 			err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
 			return err

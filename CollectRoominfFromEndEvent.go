@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
-	"strconv"
+	//	"strings"
+	//	"strconv"
 	"time"
+
+	"net/http"
 
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi"
-	"github.com/Chouette2100/srapi"
+	//	"github.com/Chouette2100/srapi"
 	"github.com/Chouette2100/srdblib"
 )
 
@@ -27,6 +29,7 @@ type Uinf struct {
 // これはイベント終了日の翌日12時から翌々日12時までのあいだに行う必要がある)
 // 前日終了のイベントのデータを取得するか、前々日のものを取得するかは実行時刻に応じて判断される。
 func CollectRoominfFromEndEvent(
+	client *http.Client,
 	tevent string,
 	teventuser string,
 	tuser string,
@@ -40,15 +43,6 @@ func CollectRoominfFromEndEvent(
 
 	var stmt *sql.Stmt
 	var rows *sql.Rows
-
-	//      cookiejarがセットされたHTTPクライアントを作る
-	client, jar, err := exsrapi.CreateNewClient("ShowroomCGI")
-	if err != nil {
-		log.Printf("CreateNewClient: %s\n", err.Error())
-		return
-	}
-	//      すべての処理が終了したらcookiejarを保存する。
-	defer jar.Save()
 
 	tnow := time.Now().Truncate((time.Second)) // 秒より下を切り捨てる。時刻の比較を整数の比較と同等にする。
 	hh, _, _ := tnow.Clock()
@@ -109,6 +103,16 @@ func CollectRoominfFromEndEvent(
 
 		// =============================================== ここから　CollectOneRoominfFromEndEvent()
 
+
+		err = CollectOneRoominfFromEndEvent(client, tevent, teventuser, tuser, tuserhistory, tnow, eid)
+		if err != nil {
+			err = fmt.Errorf("CollectOneRoominfFromEndEvent(): %w", err)
+			continue
+		}
+
+		// =============================================== ここまで　CollectOneRoominfFromEndEvent()
+
+		/*
 		//	取得すべきデータの存在チェック（取得済みかのチェック）
 		nrow := 0
 		sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
@@ -189,6 +193,7 @@ func CollectRoominfFromEndEvent(
 				return err
 			}
 		}
+		*/
 
 		//	========================================================= ここまで CollectOneRoominfFromEndEvent()
 	}
