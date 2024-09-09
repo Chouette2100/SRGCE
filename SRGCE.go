@@ -206,8 +206,9 @@ import (
 	Ver. 01AL00 CollectOneRoominfFromEndEvent()を作成する
 	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
 	Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
+	Ver. 01AM01 UpinstUserSetProperty()のタイミングを調整する。
 */
-const Version = "01AM00"
+const Version = "01AM01"
 
 func main() {
 

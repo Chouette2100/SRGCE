@@ -127,7 +127,7 @@ func CollectOneRoominfFromEndEvent(
 		//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
 		wuser := new(srdblib.Wuser)
 		wuser.Userno = uinf.Userno
-		err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440, 1000)
+		err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
 		if err != nil {
 			err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
 			return err
