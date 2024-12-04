@@ -207,8 +207,9 @@ import (
 	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
 	Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
 	Ver. 01AM01 UpinstUserSetProperty()のタイミングを調整する。
+	Ver. 01AN00 データ取得対象イベントの追加を自動で行う機能を追加する。
 */
-const Version = "01AM01"
+const Version = "01AN00"
 
 func main() {
 
@@ -311,5 +312,11 @@ func main() {
 	if err != nil {
 		log.Printf("  CollectRoominfFromEndEvent() returned err=%s\n", err.Error())
 	}
+
+	//  開催直前および開催中のイベントでデータ取得登録が行われていないものを登録する。
+	err = MakeDataOfNewEvents()
+	if err != nil {
+		log.Printf("  MakeDataOfNewEvents() returned err=%s\n", err.Error())
+	}	
 
 }
