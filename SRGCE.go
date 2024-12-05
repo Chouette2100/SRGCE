@@ -210,13 +210,14 @@ import (
 	Ver. 01AN00 データ取得対象イベントの追加を自動で行う機能を追加する。
 	Ver. 01AP00 weventとeventを同一の関数で処理することをやめる。MakeDataOfEvent()の戻り値をチェックす
 	Ver. 01AP01 MakeDataOfEvent()の処理対象イベントの抽出条件の時間帯を変更する。
+	Ver. 01AP02 関数名に正しく親の関数名を表示するようにexsrapi.PrHdr()を修正した
 */
-const Version = "01AP01"
+const Version = "01AP02"
 
 func main() {
 
 	//      ログファイルを開く。
-	logfile, err := exsrapi.CreateLogfile(Version)
+	logfile, err := exsrapi.CreateLogfile(Version, srdblib.Version, exsrapi.Version)
 	if err != nil {
 		log.Printf("err=%s.\n", err.Error())
 		return
