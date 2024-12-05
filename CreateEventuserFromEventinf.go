@@ -13,7 +13,7 @@ import (
 )
 
 func CreateEventuserFromEventinf(
-	teventuser string,
+	//	teventuser string,
 	eventid string,
 	//	roominf exsrapi.RoomInfo,
 	uinf Uinf,
@@ -31,7 +31,8 @@ func CreateEventuserFromEventinf(
 	//	レコードがすでに存在するか？
 	nrow := 0
 	status = "ignored."
-	sqls := "select count(*) from " + teventuser + " where userno =? and eventid = ?"
+	//	sqls := "select count(*) from " + teventuser + " where userno =? and eventid = ?"
+	sqls := "select count(*) from weventuser where userno =? and eventid = ?"
 	//	err = srdblib.Db.QueryRow(sqls, roominf.ID, eventid).Scan(&nrow)
 	err = srdblib.Db.QueryRow(sqls, userno, eventid).Scan(&nrow)
 	if err != nil {
@@ -43,7 +44,8 @@ func CreateEventuserFromEventinf(
 	if nrow == 0 {
 		//	存在しない。
 		var stmti *sql.Stmt
-		sqli := "INSERT INTO " + teventuser + "(eventid, userno, point, vld) VALUES(?,?,?,?)"
+		//	sqli := "INSERT INTO " + teventuser + "(eventid, userno, point, vld) VALUES(?,?,?,?)"
+		sqli := "INSERT INTO weventuser (eventid, userno, point, vld) VALUES(?,?,?,?)"
 		stmti, err = srdblib.Db.Prepare(sqli)
 		if err != nil {
 			//	log.Printf("error(INSERT/Prepare) err=%s\n", err.Error())

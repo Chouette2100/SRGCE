@@ -17,27 +17,29 @@ func MakeDataOfNewEvents() (err error) {
 	defer exsrapi.PrintExf("", fn)()
 
 
-	thdata, err := exsrapi.ReadThdata()
+	var thdata *exsrapi.Thdata
+	thdata, err = exsrapi.ReadThdata()
 	if err != nil {
 		err = fmt.Errorf("ReadThdata() error: %w", err)
 		return
 	}
 
 	sqlst := "select * from wevent "
-	sqlst += " where achk = 0 and  now() between starttime and endtime  "
+	sqlst += " where achk = 0 and  now() between SUBDATE(starttime,INTERVAL ? hour) and endtime  "
 	sqlst += "   and eventid not in "
 	sqlst += "  ( select eventid from event "
 	sqlst += " where Achk = 0  and now() between SUBDATE(starttime,INTERVAL ? hour) and endtime ) "
 	sqlst += "  order by starttime "
 
-	rows, err := srdblib.Dbmap.Select(srdblib.Wevent{}, sqlst, thdata.Hh)
+	var rows []interface{}
+	rows, err = srdblib.Dbmap.Select(srdblib.Wevent{}, sqlst, thdata.Hh, thdata.Hh)
 
 	//	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
 	for _, v := range rows {
 		wevent := v.(*srdblib.Wevent)
 		//	log.Printf("%24s%s\n", event.Eventid, event.Event_name)
 		event := srdblib.Event(*wevent)
-		MakeDataOfEvent(&event, thdata)
+		err = MakeDataOfEvent(&event, thdata)
 		if err != nil {
 			err = fmt.Errorf("MakeDataOfEvent() error: %w", err)
 			return

@@ -22,26 +22,27 @@ import (
 
 func CollectOneRoominfFromEndEvent(
 	client *http.Client,
-	tevent string,
-	teventuser string,
-	tuser string,
-	tuserhistory string,
+	//	tevent string,
+	//	teventuser string,
+	//	tuser string,
+	//	tuserhistory string,
 	tnow time.Time,
 	eid string,
 ) (
 	err error,
 ) {
 
-	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, tuser).SetKeys(false, "Userno")
-	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, tuserhistory).SetKeys(false, "Userno", "Ts")
-	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
-	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, teventuser).SetKeys(false, "Eventid", "Userno")
+	//	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, tuser).SetKeys(false, "Userno")
+	//	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, tuserhistory).SetKeys(false, "Userno", "Ts")
+	//	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
+	//	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, teventuser).SetKeys(false, "Eventid", "Userno")
 
 	log.Printf("eventid: %s\n", eid)
 
 	// 取得すべきデータの存在チェック（取得済みかのチェック）
 	nrow := 0
-	sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
+	//	sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
+	sqlsc := "select count(*) from wevent where eventid = ?"
 	srdblib.Db.QueryRow(sqlsc, eid).Scan(&nrow)
 	if nrow > 0 {
 		//	取得済み
@@ -112,7 +113,8 @@ func CollectOneRoominfFromEndEvent(
 
 	for _, uinf := range uinflist {
 		status := ""
-		status, err = CreateEventuserFromEventinf(teventuser, eid, uinf)
+		// status, err = CreateEventuserFromEventinf(teventuser, eid, uinf)
+		status, err = CreateEventuserFromEventinf(eid, uinf)
 		if err != nil {
 			err = fmt.Errorf("CreateEventuserFromEventinf(): %w", err)
 			status = "**error"

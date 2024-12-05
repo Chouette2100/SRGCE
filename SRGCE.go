@@ -208,8 +208,10 @@ import (
 	Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
 	Ver. 01AM01 UpinstUserSetProperty()のタイミングを調整する。
 	Ver. 01AN00 データ取得対象イベントの追加を自動で行う機能を追加する。
+	Ver. 01AP00 weventとeventを同一の関数で処理することをやめる。MakeDataOfEvent()の戻り値をチェックす
+	Ver. 01AP01 MakeDataOfEvent()の処理対象イベントの抽出条件の時間帯を変更する。
 */
-const Version = "01AN00"
+const Version = "01AP01"
 
 func main() {
 
@@ -247,18 +249,14 @@ func main() {
 	defer srdblib.Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
-	//      テーブルは"w"で始まるものを操作の対象とする。
-	//	srdblib.Tevent = "wevent"
-	//	srdblib.Teventuser = "weventuser"
-	//	srdblib.Tuser = "wuser"
-	//	srdblib.Tuserhistory = "wuserhistory"
-
 	dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
 	srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
 	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
-	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
-	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
-	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+	srdblib.Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+	srdblib.Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
+	srdblib.Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+
+	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
 
 
 	//	現在開催中のイベントの一覧を求める。

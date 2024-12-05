@@ -104,7 +104,8 @@ func CollectRoominfFromEndEvent(
 		// =============================================== ここから　CollectOneRoominfFromEndEvent()
 
 
-		err = CollectOneRoominfFromEndEvent(client, tevent, teventuser, tuser, tuserhistory, tnow, eid)
+		//	err = CollectOneRoominfFromEndEvent(client, tevent, teventuser, tuser, tuserhistory, tnow, eid)
+		err = CollectOneRoominfFromEndEvent(client, tnow, eid)
 		if err != nil {
 			err = fmt.Errorf("CollectOneRoominfFromEndEvent(): %w", err)
 			continue

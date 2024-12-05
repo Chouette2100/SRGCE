@@ -24,10 +24,10 @@ import (
 func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 	type args struct {
 		client       *http.Client
-		tevent       string
-		teventuser   string
-		tuser        string
-		tuserhistory string
+		//	tevent       string
+		//	teventuser   string
+		//	tuser        string
+		//	tuserhistory string
 		tnow         time.Time
 		eid          string
 	}
@@ -60,10 +60,10 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 	
 		dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
 		srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
-		//	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
-		//	srdblib.Dbmap.AddTableWithName(srdblib.Userhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
-		//	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "wevent").SetKeys(false, "Eventid")
-		//	srdblib.Dbmap.AddTableWithName(srdblib.Eventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+		srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
+		srdblib.Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+		srdblib.Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
+		srdblib.Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
 
 
 		//      cookiejarがセットされたHTTPクライアントを作る
@@ -87,10 +87,10 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 			name: "TestCollectOneRoominfFromEndEvent-1",
 			args: args{
 				client:       client,
-				tevent:       "tevent",
-				teventuser:   "teventuser",
-				tuser:        "tuser",
-				tuserhistory: "tuserhistory",
+				//	tevent:       "tevent",
+				//	teventuser:   "teventuser",
+				//	tuser:        "tuser",
+				//	tuserhistory: "tuserhistory",
 				tnow:         tnow,
 				eid:          "kareai_newad_s?block_id=20101",
 			},
@@ -104,7 +104,8 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CollectOneRoominfFromEndEvent(tt.args.client, tt.args.tevent, tt.args.teventuser, tt.args.tuser, tt.args.tuserhistory, tt.args.tnow, tt.args.eid); (err != nil) != tt.wantErr {
+			//	if err := CollectOneRoominfFromEndEvent(tt.args.client, tt.args.tevent, tt.args.teventuser, tt.args.tuser, tt.args.tuserhistory, tt.args.tnow, tt.args.eid); (err != nil) != tt.wantErr {
+			if err := CollectOneRoominfFromEndEvent(tt.args.client, tt.args.tnow, tt.args.eid); (err != nil) != tt.wantErr {
 				t.Errorf("CollectOneRoominfFromEndEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
