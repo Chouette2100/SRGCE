@@ -73,6 +73,7 @@ func MakeDataOfEvent(event *srdblib.Event, thdata *exsrapi.Thdata) (err error) {
 	//	event.Maxpoint =
 	var eventinf exsrapi.Event_Inf = exsrapi.Event_Inf{
 		Event_ID: event.Eventid,
+		Event_name: event.Event_name,
 	}
 	err = exsrapi.SetThdata(&eventinf, thdata)
 	if err != nil {

@@ -170,11 +170,11 @@ package main
 
 import (
 	//	"html/template"
-	"io" //　ログ出力設定用。必要に応じて。
+	// "io" //　ログ出力設定用。必要に応じて。
 	"log"
 	//	"net/http"
 	//	"net/http/cgi"
-	"os"
+	// "os"
 
 	//	"github.com/dustin/go-humanize"
 
@@ -211,8 +211,11 @@ import (
 	Ver. 01AP00 weventとeventを同一の関数で処理することをやめる。MakeDataOfEvent()の戻り値をチェックす
 	Ver. 01AP01 MakeDataOfEvent()の処理対象イベントの抽出条件の時間帯を変更する。
 	Ver. 01AP02 関数名に正しく親の関数名を表示するようにexsrapi.PrHdr()を修正した
+	Ver. 01AP03 w系テーブルの作成用SQLを削除する（SRDBに存在するから）
+	Ver. 01AP04 exsrapiの変更にともないビルドをやり直す
+	Ver. 01AP05 MakeDataOfEvent()でeventnfにEvent_nameを設定する。
 */
-const Version = "01AP02"
+const Version = "01AP05"
 
 func main() {
 
@@ -222,7 +225,8 @@ func main() {
 		log.Printf("err=%s.\n", err.Error())
 		return
 	}
-	log.SetOutput(io.MultiWriter(logfile, os.Stdout))
+	// log.SetOutput(io.MultiWriter(logfile, os.Stdout))
+	log.SetOutput(logfile)
 
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
