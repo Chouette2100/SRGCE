@@ -214,8 +214,9 @@ import (
 	Ver. 01AP03 w系テーブルの作成用SQLを削除する（SRDBに存在するから）
 	Ver. 01AP04 exsrapiの変更にともないビルドをやり直す
 	Ver. 01AP05 MakeDataOfEvent()でeventnfにEvent_nameを設定する。
+	Ver. 01AQ00 2025年2月初旬の仕様（レイアウト）変更に対応する（ブロックイベント、イベントボックスの展開）
 */
-const Version = "01AP05"
+const Version = "01AQ00"
 
 func main() {
 

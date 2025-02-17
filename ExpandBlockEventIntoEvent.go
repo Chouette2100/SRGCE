@@ -4,6 +4,8 @@ import (
 	//	"database/sql"
 	"fmt"
 	"log"
+	"strings"
+	"strconv"
 
 	"github.com/Chouette2100/exsrapi"
 	"github.com/Chouette2100/srdblib"
@@ -28,8 +30,10 @@ func ExpandBlockEventIntoEvent(
 
 		//	var blocklist []exsrapi.Block
 		//	blocklist, err = exsrapi.GetEventidOfBlockEvent(eid)
-		var blockinflist exsrapi.BlockInfList
-		blockinflist, err = exsrapi.GetEventidOfBlockEvent(eid)
+		// var blockinflist exsrapi.BlockInfList
+		var blockinflist BlockInfList
+		// blockinflist, err = exsrapi.GetEventidOfBlockEvent(eid)
+		blockinflist, err = GetEventidOfBlockEvent(eid)
 		if err != nil {
 			err = fmt.Errorf("exsrapi.GetEventidOfEventBox(): %w", err)
 			//	return
@@ -45,23 +49,54 @@ func ExpandBlockEventIntoEvent(
 
 		eventinflist := make([]exsrapi.Event_Inf, 0)
 		for _, blockinf := range blockinflist.Blockinf {
+			var blockname_org string
 			blockname := blockinf.Show_rank_label
-			blocklist := blockinf.Block_list
-		for _, block := range blocklist {
-			var eventinf exsrapi.Event_Inf
-			blockid := fmt.Sprintf("%d", block.Block_id)
-			eidb := eid + "?block_id=" + blockid
-			err = exsrapi.GetEventinf(eidb, &eventinf)
-			if err != nil {
-				log.Printf("GetEventinf(): %v", err)
-				//	return fmt.Errorf("GetEventinf(): %v", status)
+			if strings.Contains(blockname, "\"") {
+			blockname = strings.Replace(blockname, "\"", "", -1)
 			} else {
-				eventinf.Event_ID = eidb
-				eventinf.Event_name += "[" + blockname + "][" + block.Label + "](" + blockid + ")"
-				eventinflist = append(eventinflist, eventinf)
+				blockname_org = blockname
+				blockname = "Overall"
+			}
+			blocklist := blockinf.Block_list
+			for _, block := range blocklist {
+				label := block.Label
+				blockid := fmt.Sprintf("%d", block.Block_id)
+				eidb := eid + "?block_id=" + blockid
+
+				if strings.Contains(label, "\"") {
+					label = strings.Replace(label, "\"", "", -1)
+				} else {
+					if label == blockname_org {
+						label = blockname
+					} else {
+						label = strconv.Itoa(block.Block_id % 10)
+					}
+				}
+				var eventinf exsrapi.Event_Inf
+				// err = exsrapi.GetEventinf(eidb, &eventinf)
+				var weventinf srdblib.Wevent
+				var intf interface{}
+				intf, err = srdblib.Dbmap.Get(&weventinf, eid)
+				if err != nil {
+					log.Printf("GetEventinf(): %v", err)
+					//	return fmt.Errorf("GetEventinf(): %v", status)
+				} else {
+					weventinf = *intf.(*srdblib.Wevent)
+					eventinf = exsrapi.Event_Inf{
+						Event_ID:   eidb,
+						I_Event_ID:   weventinf.Ieventid,
+						Event_name: weventinf.Event_name + "[" + blockname + "][" + label + "](" + blockid + ")",
+						Period:    weventinf.Period,
+						Start_time: weventinf.Starttime,
+						End_time:   weventinf.Endtime,
+						Rstatus: "",
+					}
+					// eventinf.Event_ID = eidb
+					// eventinf.Event_name += "[" + blockname + "][" + block.Label + "](" + blockid + ")"
+					eventinflist = append(eventinflist, eventinf)
+				}
 			}
 		}
-	}
 		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
