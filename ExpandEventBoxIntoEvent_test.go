@@ -7,8 +7,8 @@ import(
 
 "testing"
 
-"github.com/Chouette2100/exsrapi"
-"github.com/Chouette2100/srdblib"
+"github.com/Chouette2100/exsrapi/v2"
+"github.com/Chouette2100/srdblib/v2"
 )
 
 func TestExpandEventBoxIntoEvent(t *testing.T) {

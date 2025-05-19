@@ -15,9 +15,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/Chouette2100/exsrapi"
-	//	"github.com/Chouette2100/srapi"
-	"github.com/Chouette2100/srdblib"
+	"github.com/Chouette2100/exsrapi/v2"
+	//	"github.com/Chouette2100/srapi/v2"
+	"github.com/Chouette2100/srdblib/v2"
 )
 
 func CollectOneRoominfFromEndEvent(
@@ -129,7 +129,8 @@ func CollectOneRoominfFromEndEvent(
 		//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
 		wuser := new(srdblib.Wuser)
 		wuser.Userno = uinf.Userno
-		err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
+		// err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
+		_, err = srdblib.UpinsUser(client, tnow, wuser)
 		if err != nil {
 			err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
 			return err

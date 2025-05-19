@@ -7,8 +7,10 @@ import (
 	//	"database/sql"
 	//	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/Chouette2100/exsrapi"
-	"github.com/Chouette2100/srdblib"
+	"github.com/jinzhu/copier"
+
+	"github.com/Chouette2100/exsrapi/v2"
+	"github.com/Chouette2100/srdblib/v2"
 )
 
 func MakeDataOfNewEvents() (err error) {
@@ -38,7 +40,9 @@ func MakeDataOfNewEvents() (err error) {
 	for _, v := range rows {
 		wevent := v.(*srdblib.Wevent)
 		//	log.Printf("%24s%s\n", event.Eventid, event.Event_name)
-		event := srdblib.Event(*wevent)
+		// event := srdblib.Event(*wevent)
+		var event srdblib.Event
+		copier.Copy(&event, wevent)
 		err = MakeDataOfEvent(&event, thdata)
 		if err != nil {
 			err = fmt.Errorf("MakeDataOfEvent() error: %w", err)

@@ -183,40 +183,44 @@ import (
 
 	"github.com/go-gorp/gorp"
 
-	"github.com/Chouette2100/exsrapi"
-	"github.com/Chouette2100/srdblib"
+	"github.com/Chouette2100/exsrapi/v2"
+	"github.com/Chouette2100/srdblib/v2"
 )
 
 /*
-	Ver. 01AA00	基本的動作を確認する。
-	Ver. 01AB00	進捗状況の表示をuserの更新基準からeventuserの更新基準に変更する。
-	Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
-	Ver. 01AB02	最終結果取得済みのイベントをスキップする。
-	Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
-	Ver. 01AD00	開催予定イベントの取得を行う。
-	Ver. 01AD01	ブロックイベントで最初の階層（＝ランク？）が複数のもので展開が正しくできるようにする。
-	Ver. 01AE00	Periodを生成しweventテーブルに格納する。
-	Ver. 01AF00	srdblib.InsertEventinflistToEven()の引数にイベント名が追加されたことに対応する。
-	Ver. 01AG00	ExpandBlockEventIntoEvent() 子イベントの展開中のエラーは次のブロックイベントの展開にスキップする。
-				exsrapi.GetEventidOfBlockEvent() 子イベントのブロックIDへのセレクタ−を変更する。
-	Ver. 01AH00	srdblib.Tevent の形を tevent として引数で引き継ぐようにする。
-	Ver. 01AJ00	gorpを導入する。イベント最終結果の取得にsrapi.ApiEventsRanking()を使う。
-	Ver. 01AJ01 srapi.ApiEventsRanking()で結果が得られないときi(=レベルイベント)はexsrapi.GetEventinfAndRoomList()を使う
-	Ver. 01AK01 CollectRoominfFromEndEvent()にてブロックイベントの結果の取得方法を正す（block_idを指定する）
-	Ver. 01AL00 CollectOneRoominfFromEndEvent()を作成する
-	Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
-	Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
-	Ver. 01AM01 UpinstUserSetProperty()のタイミングを調整する。
-	Ver. 01AN00 データ取得対象イベントの追加を自動で行う機能を追加する。
-	Ver. 01AP00 weventとeventを同一の関数で処理することをやめる。MakeDataOfEvent()の戻り値をチェックす
-	Ver. 01AP01 MakeDataOfEvent()の処理対象イベントの抽出条件の時間帯を変更する。
-	Ver. 01AP02 関数名に正しく親の関数名を表示するようにexsrapi.PrHdr()を修正した
-	Ver. 01AP03 w系テーブルの作成用SQLを削除する（SRDBに存在するから）
-	Ver. 01AP04 exsrapiの変更にともないビルドをやり直す
-	Ver. 01AP05 MakeDataOfEvent()でeventnfにEvent_nameを設定する。
-	Ver. 01AQ00 2025年2月初旬の仕様（レイアウト）変更に対応する（ブロックイベント、イベントボックスの展開）
+Ver. 01AA00	基本的動作を確認する。
+Ver. 01AB00	進捗状況の表示をuserの更新基準からeventuserの更新基準に変更する。
+Ver. 01AB01	取得したデータがどのように処理されたかを表示する。
+Ver. 01AB02	最終結果取得済みのイベントをスキップする。
+Ver. 01AC00	イベント終了日範囲の取得方法を変更する（tnow.Truncate(24 * time.Hour)が9時以前は1日前の日になるから）
+Ver. 01AD00	開催予定イベントの取得を行う。
+Ver. 01AD01	ブロックイベントで最初の階層（＝ランク？）が複数のもので展開が正しくできるようにする。
+Ver. 01AE00	Periodを生成しweventテーブルに格納する。
+Ver. 01AF00	srdblib.InsertEventinflistToEven()の引数にイベント名が追加されたことに対応する。
+Ver. 01AG00	ExpandBlockEventIntoEvent() 子イベントの展開中のエラーは次のブロックイベントの展開にスキップする。
+
+	exsrapi.GetEventidOfBlockEvent() 子イベントのブロックIDへのセレクタ−を変更する。
+
+Ver. 01AH00	srdblib.Tevent の形を tevent として引数で引き継ぐようにする。
+Ver. 01AJ00	gorpを導入する。イベント最終結果の取得にsrapi.ApiEventsRanking()を使う。
+Ver. 01AJ01 srapi.ApiEventsRanking()で結果が得られないときi(=レベルイベント)はexsrapi.GetEventinfAndRoomList()を使う
+Ver. 01AK01 CollectRoominfFromEndEvent()にてブロックイベントの結果の取得方法を正す（block_idを指定する）
+Ver. 01AL00 CollectOneRoominfFromEndEvent()を作成する
+Ver. 01AL01 block_id=0 が存在することに対する一時的回避処理を追加する(この時点ではCollectOneRoominfFromEndEvent()は不使用)
+Ver. 01AM00 CollectRoominfFromEndEvent) - CollectOneRoominfFromEndEvent()- GetEventsRankingByApi()を使う
+Ver. 01AM01 UpinstUserSetProperty()のタイミングを調整する。
+Ver. 01AN00 データ取得対象イベントの追加を自動で行う機能を追加する。
+Ver. 01AP00 weventとeventを同一の関数で処理することをやめる。MakeDataOfEvent()の戻り値をチェックす
+Ver. 01AP01 MakeDataOfEvent()の処理対象イベントの抽出条件の時間帯を変更する。
+Ver. 01AP02 関数名に正しく親の関数名を表示するようにexsrapi.PrHdr()を修正した
+Ver. 01AP03 w系テーブルの作成用SQLを削除する（SRDBに存在するから）
+Ver. 01AP04 exsrapiの変更にともないビルドをやり直す
+Ver. 01AP05 MakeDataOfEvent()でeventnfにEvent_nameを設定する。
+Ver. 01AQ00 2025年2月初旬の仕様（レイアウト）変更に対応する（ブロックイベント、イベントボックスの展開）
+Ver. 01AR00 イベントボックスの展開に関していろいろなパターンを考慮し、またexsrapi.GetEventinf()はAPIによる新バージョンを使用する。
+Ver. 02AA00 v2パッケージに移行する。
 */
-const Version = "01AQ00"
+const Version = "02AA00"
 
 func main() {
 
@@ -232,16 +236,14 @@ func main() {
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
 
-		//      cookiejarがセットされたHTTPクライアントを作る
-		client, jar, err := exsrapi.CreateNewClient("ShowroomCGI")
-		if err != nil {
-			log.Printf("CreateNewClient: %s\n", err.Error())
-			return
-		}
-		//      すべての処理が終了したらcookiejarを保存する。
-		defer jar.Save()
-	
-	
+	//      cookiejarがセットされたHTTPクライアントを作る
+	client, jar, err := exsrapi.CreateNewClient("ShowroomCGI")
+	if err != nil {
+		log.Printf("CreateNewClient: %s\n", err.Error())
+		return
+	}
+	//      すべての処理が終了したらcookiejarを保存する。
+	defer jar.Save()
 
 	//      データベースとの接続をオープンする。
 	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
@@ -263,7 +265,6 @@ func main() {
 	srdblib.Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
 
 	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
-
 
 	//	現在開催中のイベントの一覧を求める。
 	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み
@@ -321,6 +322,6 @@ func main() {
 	err = MakeDataOfNewEvents()
 	if err != nil {
 		log.Printf("  MakeDataOfNewEvents() returned err=%s\n", err.Error())
-	}	
+	}
 
 }
