@@ -219,8 +219,9 @@ Ver. 01AP05 MakeDataOfEvent()でeventnfにEvent_nameを設定する。
 Ver. 01AQ00 2025年2月初旬の仕様（レイアウト）変更に対応する（ブロックイベント、イベントボックスの展開）
 Ver. 01AR00 イベントボックスの展開に関していろいろなパターンを考慮し、またexsrapi.GetEventinf()はAPIによる新バージョンを使用する。
 Ver. 02AA00 v2パッケージに移行する。
+Ver. 02AB00 ブロックイベントリストの作成にsrapi.ApiEventRanking()を使うようにする。
 */
-const Version = "02AA00"
+const Version = "02AB00"
 
 func main() {
 

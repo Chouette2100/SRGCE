@@ -21,7 +21,10 @@ func TestCreateCurrentEventList(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			name: "Test1",
-			args: args{status: 3},
+			args: args{
+				client: &http.Client{},
+				status: 3,
+			},
 			wantTop: &OngoingEvent{
 				0,
 				0,

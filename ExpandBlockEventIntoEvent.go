@@ -4,10 +4,13 @@ import (
 	//	"database/sql"
 	"fmt"
 	"log"
-	"strings"
 	"strconv"
+	"strings"
+
+	"net/http"
 
 	"github.com/Chouette2100/exsrapi/v2"
+	"github.com/Chouette2100/srapi/v2"
 	"github.com/Chouette2100/srdblib/v2"
 )
 
@@ -33,11 +36,28 @@ func ExpandBlockEventIntoEvent(
 		// var blockinflist exsrapi.BlockInfList
 		var blockinflist BlockInfList
 		// blockinflist, err = exsrapi.GetEventidOfBlockEvent(eid)
-		blockinflist, err = GetEventidOfBlockEvent(eid)
-		if err != nil {
-			err = fmt.Errorf("exsrapi.GetEventidOfEventBox(): %w", err)
-			//	return
-			continue
+		/*
+			blockinflist, err = GetEventidOfBlockEvent(eid)
+			if err != nil {
+				err = fmt.Errorf("exsrapi.GetEventidOfEventBox(): %w", err)
+				//	return
+				continue
+			}
+		*/
+		client := &http.Client{}
+		var er *srapi.EventRanking
+		er, err = srapi.ApiEventRanking(client, eid, 1)
+		for _, ebl := range er.EventBlockList {
+			var blockinf BlockInf
+			blockinf.Show_rank_label = ebl.ShowRankLabel
+			blockinf.Block_list = make([]Block, 0)
+			for _, eb := range ebl.BlockList {
+				var block Block
+				block.Label = eb.Label
+				block.Block_id = eb.BlockID
+				blockinf.Block_list = append(blockinf.Block_list, block)
+			}
+			blockinflist.Blockinf = append(blockinflist.Blockinf, blockinf)
 		}
 
 		//	if len(blocklist) == 0 {
@@ -52,7 +72,7 @@ func ExpandBlockEventIntoEvent(
 			var blockname_org string
 			blockname := blockinf.Show_rank_label
 			if strings.Contains(blockname, "\"") {
-			blockname = strings.Replace(blockname, "\"", "", -1)
+				blockname = strings.Replace(blockname, "\"", "", -1)
 			} else {
 				blockname_org = blockname
 				blockname = "Overall"
@@ -84,12 +104,12 @@ func ExpandBlockEventIntoEvent(
 					weventinf = *intf.(*srdblib.Wevent)
 					eventinf = exsrapi.Event_Inf{
 						Event_ID:   eidb,
-						I_Event_ID:   weventinf.Ieventid,
+						I_Event_ID: weventinf.Ieventid,
 						Event_name: weventinf.Event_name + "[" + blockname + "][" + label + "](" + blockid + ")",
-						Period:    weventinf.Period,
+						Period:     weventinf.Period,
 						Start_time: weventinf.Starttime,
 						End_time:   weventinf.Endtime,
-						Rstatus: "",
+						Rstatus:    "",
 					}
 					// eventinf.Event_ID = eidb
 					// eventinf.Event_name += "[" + blockname + "][" + block.Label + "](" + blockid + ")"
