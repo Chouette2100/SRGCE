@@ -16,7 +16,7 @@ import (
 func StoreEventinflistInEvent(
 	tevent string,
 	eventinflist []exsrapi.Event_Inf,
-	) (
+) (
 	err error,
 ) {
 
@@ -27,18 +27,18 @@ func StoreEventinflistInEvent(
 
 	//	既存データの変化をチェックする必要があるカラムの抽出用SQL
 	sqls := "select endtime, period, noentry, achk from " + tevent + " where eventid = ?"
-	stmts, srdblib.Dberr = srdblib.Db.Prepare(sqls)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("Prepare(sqls): %w", srdblib.Dberr)
+	stmts, err = srdblib.Db.Prepare(sqls)
+	if err != nil {
+		err = fmt.Errorf("Prepare(sqls): %w", err)
 		return
 	}
 	defer stmts.Close()
 
 	//	データが変更されたカラムの更新用SQL
 	sqlu := "UPDATE " + tevent + " SET endtime = ?, period = ?, noentry = ?, achk = ? WHERE eventid = ?"
-	stmtu, srdblib.Dberr = srdblib.Db.Prepare(sqlu)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("Prepare(sqlu): %w", srdblib.Dberr)
+	stmtu, err = srdblib.Db.Prepare(sqlu)
+	if err != nil {
+		err = fmt.Errorf("Prepare(sqlu): %w", err)
 		return
 	}
 	defer stmtu.Close()
@@ -52,20 +52,20 @@ func StoreEventinflistInEvent(
 			continue
 		}
 		//	存在確認
-		srdblib.Dberr = stmts.QueryRow(eventinf.Event_ID).Scan(&endtime, &period, &noentry, &achk)
+		err = stmts.QueryRow(eventinf.Event_ID).Scan(&endtime, &period, &noentry, &achk)
 		switch {
-		case srdblib.Dberr == sql.ErrNoRows:
+		case err == sql.ErrNoRows:
 			//	存在しない。
 			//	後続の処理でinsertする。
 			eventinflist[i].Valid = true
-		case srdblib.Dberr != nil:
+		case err != nil:
 			//	エラー
-			err = fmt.Errorf("QueryRow(event.Event_ID).Scan(): %w", srdblib.Dberr)
+			err = fmt.Errorf("QueryRow(event.Event_ID).Scan(): %w", err)
 			return
 		default:
 			//	存在する。endtime、achkが違うならupdateする。
 			reason := ""
-			if eventinf.End_time.Sub(endtime)  < time.Second * -1 || eventinf.End_time.Sub(endtime) > time.Second{
+			if eventinf.End_time.Sub(endtime) < time.Second*-1 || eventinf.End_time.Sub(endtime) > time.Second {
 				//	終了時刻が変更された。
 				reason += "E"
 			} else {
@@ -108,7 +108,7 @@ func StoreEventinflistInEvent(
 	if len(eventinflist) != 0 {
 		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, false)
 		if err != nil {
-			err = fmt.Errorf("InsertEventinflistToEvent(): %w", srdblib.Dberr)
+			err = fmt.Errorf("InsertEventinflistToEvent(): %w", err)
 			return
 		}
 	}

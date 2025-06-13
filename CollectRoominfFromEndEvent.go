@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+
 	//	"strings"
 	//	"strconv"
 	"time"
@@ -71,16 +72,16 @@ func CollectRoominfFromEndEvent(
 	log.Printf("tday2: %s\n", tday2.Format("2006-01-02 15:04:05 MST"))
 
 	sqlstmt := "select eventid from " + tevent + " where achk = 0 and endtime > ? and endtime < ?"
-	stmt, srdblib.Dberr = srdblib.Db.Prepare(sqlstmt)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("srdblib.Db.Prepare(): %w", srdblib.Dberr)
+	stmt, err = srdblib.Db.Prepare(sqlstmt)
+	if err != nil {
+		err = fmt.Errorf("srdblib.Db.Prepare(): %w", err)
 		return
 	}
 	defer stmt.Close()
 
-	rows, srdblib.Dberr = stmt.Query(tday1, tday2)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("stmt.Query(): %w", srdblib.Dberr)
+	rows, err = stmt.Query(tday1, tday2)
+	if err != nil {
+		err = fmt.Errorf("stmt.Query(): %w", err)
 		return
 	}
 	defer rows.Close()
@@ -89,9 +90,9 @@ func CollectRoominfFromEndEvent(
 
 	eid := ""
 	for rows.Next() {
-		srdblib.Dberr = rows.Scan(&eid)
-		if srdblib.Dberr != nil {
-			err = fmt.Errorf("rows.Scan(): %w", srdblib.Dberr)
+		err = rows.Scan(&eid)
+		if err != nil {
+			err = fmt.Errorf("rows.Scan(): %w", err)
 			return
 		}
 		idofevent = append(idofevent, eid)
@@ -103,7 +104,6 @@ func CollectRoominfFromEndEvent(
 
 		// =============================================== ここから　CollectOneRoominfFromEndEvent()
 
-
 		//	err = CollectOneRoominfFromEndEvent(client, tevent, teventuser, tuser, tuserhistory, tnow, eid)
 		err = CollectOneRoominfFromEndEvent(client, tnow, eid)
 		if err != nil {
@@ -114,86 +114,86 @@ func CollectRoominfFromEndEvent(
 		// =============================================== ここまで　CollectOneRoominfFromEndEvent()
 
 		/*
-		//	取得すべきデータの存在チェック（取得済みかのチェック）
-		nrow := 0
-		sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
-		srdblib.Db.QueryRow(sqlsc, eid).Scan(&nrow)
-		if nrow > 0 {
-			//	取得済み
-			log.Printf("    data exists. skip.\n")
-			continue
-		}
-
-		//	イベントの詳細を得る、ここではIeventidが必要である
-		row, err := srdblib.Dbmap.Get(srdblib.Event{}, eid)
-		if err != nil {
-			err = fmt.Errorf("Dbmap.Get(): %w", err)
-			return err
-		}
-		event := row.(*srdblib.Event)
-
-		//	イベントに参加しているルームを取得する
-		roomlistinf, err := srapi.GetRoominfFromEventByApi(client, event.Ieventid, 1, 1)
-		if err != nil {
-			err = fmt.Errorf("GetRoominfFromEventByApi(): %w", err)
-			return err
-		}
-		roomid := roomlistinf.RoomList[0].Room_id
-
-		//	イベント結果を取得する
-		bid := 0
-		if strings.Contains(event.Eventid, "block_id") {
-			eida := strings.Split(event.Eventid, "=")
-			bid, _ = strconv.Atoi(eida[1])
-		}
-		pranking, err := srapi.ApiEventsRanking(client, (event).Ieventid, roomid, bid)
-		if err != nil {
-			err = fmt.Errorf("ApiEventsRanking(): %w", err)
-			return err
-		}
-
-		uinflist := make([]Uinf, 0)
-
-		if len(pranking.Ranking) != 0 {
-			for _, ranking := range pranking.Ranking {
-				uinflist = append(uinflist, Uinf{Userno: ranking.Room.RoomID, Username: ranking.Room.Name, Point: ranking.Point, Rank: ranking.Rank})
+			//	取得すべきデータの存在チェック（取得済みかのチェック）
+			nrow := 0
+			sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
+			srdblib.Db.QueryRow(sqlsc, eid).Scan(&nrow)
+			if nrow > 0 {
+				//	取得済み
+				log.Printf("    data exists. skip.\n")
+				continue
 			}
-		} else {
-			var eventinf exsrapi.Event_Inf
-			var roominfolist exsrapi.RoomInfoList
-			//	if !strings.Contains(id, "?") {
-			exsrapi.GetEventinfAndRoomList(eid, 1, 30, &eventinf, &roominfolist)
-			//	} else {
-			//		exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
-			//	}
-			for _, roominf := range roominfolist {
-				uinflist = append(uinflist, Uinf{Userno: roominf.Userno, Username: roominf.Name, Point: roominf.Point, Rank: roominf.Irank})
-			}
-		}
 
-		for _, uinf := range uinflist {
-			status := ""
-			status, err = CreateEventuserFromEventinf(teventuser, eid, uinf)
+			//	イベントの詳細を得る、ここではIeventidが必要である
+			row, err := srdblib.Dbmap.Get(srdblib.Event{}, eid)
 			if err != nil {
-				err = fmt.Errorf("CreateEventuserFromEventinf(): %w", err)
-				status = "**error"
-				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
+				err = fmt.Errorf("Dbmap.Get(): %w", err)
 				return err
+			}
+			event := row.(*srdblib.Event)
+
+			//	イベントに参加しているルームを取得する
+			roomlistinf, err := srapi.GetRoominfFromEventByApi(client, event.Ieventid, 1, 1)
+			if err != nil {
+				err = fmt.Errorf("GetRoominfFromEventByApi(): %w", err)
+				return err
+			}
+			roomid := roomlistinf.RoomList[0].Room_id
+
+			//	イベント結果を取得する
+			bid := 0
+			if strings.Contains(event.Eventid, "block_id") {
+				eida := strings.Split(event.Eventid, "=")
+				bid, _ = strconv.Atoi(eida[1])
+			}
+			pranking, err := srapi.ApiEventsRanking(client, (event).Ieventid, roomid, bid)
+			if err != nil {
+				err = fmt.Errorf("ApiEventsRanking(): %w", err)
+				return err
+			}
+
+			uinflist := make([]Uinf, 0)
+
+			if len(pranking.Ranking) != 0 {
+				for _, ranking := range pranking.Ranking {
+					uinflist = append(uinflist, Uinf{Userno: ranking.Room.RoomID, Username: ranking.Room.Name, Point: ranking.Point, Rank: ranking.Rank})
+				}
 			} else {
-				log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
-				if status == "ignored." {
-					continue
+				var eventinf exsrapi.Event_Inf
+				var roominfolist exsrapi.RoomInfoList
+				//	if !strings.Contains(id, "?") {
+				exsrapi.GetEventinfAndRoomList(eid, 1, 30, &eventinf, &roominfolist)
+				//	} else {
+				//		exsrapi.GetEventinfAndRoomListBR(client, id, 1, 30, &eventinf, &roominfolist)
+				//	}
+				for _, roominf := range roominfolist {
+					uinflist = append(uinflist, Uinf{Userno: roominf.Userno, Username: roominf.Name, Point: roominf.Point, Rank: roominf.Irank})
 				}
 			}
-			//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
-			wuser := new(srdblib.Wuser)
-			wuser.Userno = uinf.Userno
-			err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
-			if err != nil {
-				err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
-				return err
+
+			for _, uinf := range uinflist {
+				status := ""
+				status, err = CreateEventuserFromEventinf(teventuser, eid, uinf)
+				if err != nil {
+					err = fmt.Errorf("CreateEventuserFromEventinf(): %w", err)
+					status = "**error"
+					log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
+					return err
+				} else {
+					log.Printf("  %-10s %-25s%10d%4d%10d %s\n", status, uinf.Username, uinf.Userno, uinf.Rank, uinf.Point, eid)
+					if status == "ignored." {
+						continue
+					}
+				}
+				//		err = InsertIntoOrUpdateUser(tuser, tuserhistory, tnow, id, ranking)
+				wuser := new(srdblib.Wuser)
+				wuser.Userno = uinf.Userno
+				err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
+				if err != nil {
+					err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
+					return err
+				}
 			}
-		}
 		*/
 
 		//	========================================================= ここまで CollectOneRoominfFromEndEvent()

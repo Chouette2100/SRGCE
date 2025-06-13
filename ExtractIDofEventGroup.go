@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi/v2"
@@ -29,16 +30,16 @@ func ExtractIDofEventGroup(
 	var rows *sql.Rows
 
 	sqlstmt := "select eventid from " + tevent + " where achk = ?"
-	stmt, srdblib.Dberr = srdblib.Db.Prepare(sqlstmt)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("row.Priepare(): %w", srdblib.Dberr)
+	stmt, err = srdblib.Db.Prepare(sqlstmt)
+	if err != nil {
+		err = fmt.Errorf("row.Priepare(): %w", err)
 		return
 	}
 	defer stmt.Close()
 
-	rows, srdblib.Dberr = stmt.Query(mode)
-	if srdblib.Dberr != nil {
-		err = fmt.Errorf("stmt.Query(): %w", srdblib.Dberr)
+	rows, err = stmt.Query(mode)
+	if err != nil {
+		err = fmt.Errorf("stmt.Query(): %w", err)
 		return
 	}
 	defer rows.Close()
@@ -47,9 +48,9 @@ func ExtractIDofEventGroup(
 
 	id := ""
 	for rows.Next() {
-		srdblib.Dberr = rows.Scan(&id)
-		if srdblib.Dberr != nil {
-			err = fmt.Errorf("rows.Scan(): %w", srdblib.Dberr)
+		err = rows.Scan(&id)
+		if err != nil {
+			err = fmt.Errorf("rows.Scan(): %w", err)
 			return
 		}
 		log.Printf(" parent id = %s\n", id)

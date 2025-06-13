@@ -220,8 +220,9 @@ Ver. 01AQ00 2025年2月初旬の仕様（レイアウト）変更に対応する
 Ver. 01AR00 イベントボックスの展開に関していろいろなパターンを考慮し、またexsrapi.GetEventinf()はAPIによる新バージョンを使用する。
 Ver. 02AA00 v2パッケージに移行する。
 Ver. 02AB00 ブロックイベントリストの作成にsrapi.ApiEventRanking()を使うようにする。
+Ver. 02AB01 srdblib.Dberrをerrに変更する。
 */
-const Version = "02AB00"
+const Version = "02AB01"
 
 func main() {
 
