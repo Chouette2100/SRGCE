@@ -222,8 +222,9 @@ Ver. 02AA00 v2パッケージに移行する。
 Ver. 02AB00 ブロックイベントリストの作成にsrapi.ApiEventRanking()を使うようにする。
 Ver. 02AB01 srdblib.Dberrをerrに変更する。
 Ver. 02AC00 イベント名の生成規則を変更し、さらにイベント名が変わったものはイベント情報を更新する。
+Ver. 02AC01 ExtractIDofEventGroup()に特定のブロックイベントの展開を行う場合のSQLを追加する(手作業用)
 */
-const Version = "02AC00"
+const Version = "02AC01"
 
 func main() {
 
