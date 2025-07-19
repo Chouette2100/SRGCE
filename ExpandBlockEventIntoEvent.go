@@ -4,8 +4,8 @@ import (
 	//	"database/sql"
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
+	// "strconv"
+	// "strings"
 
 	"net/http"
 
@@ -47,11 +47,14 @@ func ExpandBlockEventIntoEvent(
 		client := &http.Client{}
 		var er *srapi.EventRanking
 		er, err = srapi.ApiEventRanking(client, eid, 1)
+		log.Printf("**Evnetid = %s\n", eid)
 		for _, ebl := range er.EventBlockList {
+			log.Printf("**  ShwRankLabel = %s\n", ebl.ShowRankLabel)
 			var blockinf BlockInf
 			blockinf.Show_rank_label = ebl.ShowRankLabel
 			blockinf.Block_list = make([]Block, 0)
 			for _, eb := range ebl.BlockList {
+				log.Printf("**    BlockID = %d, Label = %s\n", eb.BlockID, eb.Label)
 				var block Block
 				block.Label = eb.Label
 				block.Block_id = eb.BlockID
@@ -69,29 +72,33 @@ func ExpandBlockEventIntoEvent(
 
 		eventinflist := make([]exsrapi.Event_Inf, 0)
 		for _, blockinf := range blockinflist.Blockinf {
-			var blockname_org string
+			// var blockname_org string
 			blockname := blockinf.Show_rank_label
-			if strings.Contains(blockname, "\"") {
-				blockname = strings.Replace(blockname, "\"", "", -1)
-			} else {
-				blockname_org = blockname
-				blockname = "Overall"
-			}
+			/*
+				if strings.Contains(blockname, "\"") {
+					blockname = strings.Replace(blockname, "\"", "", -1)
+				} else {
+					blockname_org = blockname
+					blockname = "Overall"
+				}
+			*/
 			blocklist := blockinf.Block_list
 			for _, block := range blocklist {
 				label := block.Label
 				blockid := fmt.Sprintf("%d", block.Block_id)
 				eidb := eid + "?block_id=" + blockid
 
-				if strings.Contains(label, "\"") {
-					label = strings.Replace(label, "\"", "", -1)
-				} else {
-					if label == blockname_org {
-						label = blockname
+				/*
+					if strings.Contains(label, "\"") {
+						label = strings.Replace(label, "\"", "", -1)
 					} else {
-						label = strconv.Itoa(block.Block_id % 10)
+						if label == blockname_org {
+							label = blockname
+						} else {
+							label = strconv.Itoa(block.Block_id % 10)
+						}
 					}
-				}
+				*/
 				var eventinf exsrapi.Event_Inf
 				// err = exsrapi.GetEventinf(eidb, &eventinf)
 				var weventinf srdblib.Wevent
@@ -121,6 +128,30 @@ func ExpandBlockEventIntoEvent(
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return
+		}
+		for _, eventinf := range eventinflist {
+			if !eventinf.Valid {
+				log.Printf("  **Inserted[%s]: %s\n", eventinf.Event_ID, eventinf.Event_name)
+			} else {
+				var intf interface{}
+				wev := srdblib.Wevent{}
+				if tevent != "wevent" {
+					err = fmt.Errorf("ExpandBlockEventIntoEvent(): tevent != wevent")
+				} else {
+					intf, err = srdblib.Dbmap.Get(&wev, eventinf.Event_ID)
+				}
+				if err != nil || intf == nil || intf.(*srdblib.Wevent).Event_name == eventinf.Event_name {
+					log.Printf("  **Ignored[%s]: %s\n", eventinf.Event_ID, eventinf.Event_name)
+				} else {
+					wev = *intf.(*srdblib.Wevent)
+					wev.Event_name = eventinf.Event_name
+					_, err = srdblib.Dbmap.Update(&wev)
+					if err != nil {
+						log.Printf("Update(): %v", err)
+					}
+					log.Printf("  **Updated[%s]: %s\n", eventinf.Event_ID, eventinf.Event_name)
+				}
+			}
 		}
 		_, err = srdblib.Db.Exec("UPDATE "+tevent+" SET achk = ? where eventid = ?", BlockEvent%4, eid)
 		log.Printf("  %s is BlockEvent. Number of Child Event is %d\n", eid, len(eventinflist))

@@ -221,8 +221,9 @@ Ver. 01AR00 イベントボックスの展開に関していろいろなパタ�
 Ver. 02AA00 v2パッケージに移行する。
 Ver. 02AB00 ブロックイベントリストの作成にsrapi.ApiEventRanking()を使うようにする。
 Ver. 02AB01 srdblib.Dberrをerrに変更する。
+Ver. 02AC00 イベント名の生成規則を変更し、さらにイベント名が変わったものはイベント情報を更新する。
 */
-const Version = "02AB01"
+const Version = "02AC00"
 
 func main() {
 

@@ -29,7 +29,7 @@ func ExtractIDofEventGroup(
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 
-	sqlstmt := "select eventid from " + tevent + " where achk = ?"
+	sqlstmt := "select eventid from " + tevent + " where starttime > Now() and (achk = ? or achk = ?) "
 	stmt, err = srdblib.Db.Prepare(sqlstmt)
 	if err != nil {
 		err = fmt.Errorf("row.Priepare(): %w", err)
@@ -37,7 +37,7 @@ func ExtractIDofEventGroup(
 	}
 	defer stmt.Close()
 
-	rows, err = stmt.Query(mode)
+	rows, err = stmt.Query(mode, mode&3)
 	if err != nil {
 		err = fmt.Errorf("stmt.Query(): %w", err)
 		return
