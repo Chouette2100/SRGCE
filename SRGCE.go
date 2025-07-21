@@ -174,7 +174,7 @@ import (
 	"log"
 	//	"net/http"
 	//	"net/http/cgi"
-	// "os"
+	"os"
 
 	//	"github.com/dustin/go-humanize"
 
@@ -223,10 +223,18 @@ Ver. 02AB00 ブロックイベントリストの作成にsrapi.ApiEventRanking()
 Ver. 02AB01 srdblib.Dberrをerrに変更する。
 Ver. 02AC00 イベント名の生成規則を変更し、さらにイベント名が変わったものはイベント情報を更新する。
 Ver. 02AC01 ExtractIDofEventGroup()に特定のブロックイベントの展開を行う場合のSQLを追加する(手作業用)
+Ver. 02AC02 起動時パラメータとしてイベントIDを指定するとブロックイベントに限りExtractIDofEventGroup()で展開を行う(他のイベントにも適用すべき)
 */
-const Version = "02AC01"
+const Version = "02AC02"
+
+var targetEvent string
 
 func main() {
+
+	// もし起動時パラメータが一つあればそれをtargetEventとして使用する。
+	if len(os.Args) > 1 {
+		targetEvent = os.Args[1]
+	}
 
 	//      ログファイルを開く。
 	logfile, err := exsrapi.CreateLogfile(Version, srdblib.Version, exsrapi.Version)
