@@ -18,7 +18,6 @@ func MakeDataOfNewEvents() (err error) {
 	fn := exsrapi.PrtHdr()
 	defer exsrapi.PrintExf("", fn)()
 
-
 	var thdata *exsrapi.Thdata
 	thdata, err = exsrapi.ReadThdata()
 	if err != nil {
@@ -26,7 +25,7 @@ func MakeDataOfNewEvents() (err error) {
 		return
 	}
 
-	sqlst := "select * from wevent "
+	sqlst := "select " + clmlist["wevent"] + " from wevent "
 	sqlst += " where achk = 0 and  now() between SUBDATE(starttime,INTERVAL ? hour) and endtime  "
 	sqlst += "   and eventid not in "
 	sqlst += "  ( select eventid from event "
@@ -76,7 +75,7 @@ func MakeDataOfEvent(event *srdblib.Event, thdata *exsrapi.Thdata) (err error) {
 	event.Rstatus = ""
 	//	event.Maxpoint =
 	var eventinf exsrapi.Event_Inf = exsrapi.Event_Inf{
-		Event_ID: event.Eventid,
+		Event_ID:   event.Eventid,
 		Event_name: event.Event_name,
 	}
 	err = exsrapi.SetThdata(&eventinf, thdata)

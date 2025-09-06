@@ -224,10 +224,19 @@ Ver. 02AB01 srdblib.Dberrをerrに変更する。
 Ver. 02AC00 イベント名の生成規則を変更し、さらにイベント名が変わったものはイベント情報を更新する。
 Ver. 02AC01 ExtractIDofEventGroup()に特定のブロックイベントの展開を行う場合のSQLを追加する(手作業用)
 Ver. 02AC02 起動時パラメータとしてイベントIDを指定するとブロックイベントに限りExtractIDofEventGroup()で展開を行う(他のイベントにも適用すべき)
+Ver. 02AC03 select * を使わず、カラム名を指定する。
+Ver. 200100 go.modを作り直す
 */
-const Version = "02AC02"
+const Version = "200100"
 
 var targetEvent string
+
+var clmlist map[string]string
+
+func init() {
+	clmlist = make(map[string]string)
+	clmlist["wevent"] = srdblib.ExtractStructColumns(&srdblib.Wevent{})
+}
 
 func main() {
 
