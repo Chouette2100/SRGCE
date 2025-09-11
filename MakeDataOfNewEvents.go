@@ -25,7 +25,7 @@ func MakeDataOfNewEvents() (err error) {
 		return
 	}
 
-	sqlst := "select " + clmlist["wevent"] + " from wevent "
+	sqlst := "select " + srdblib.Clmlist["wevent"] + " from wevent "
 	sqlst += " where achk = 0 and  now() between SUBDATE(starttime,INTERVAL ? hour) and endtime  "
 	sqlst += "   and eventid not in "
 	sqlst += "  ( select eventid from event "

@@ -50,7 +50,7 @@ func CollectRoominfFromEndEvent(
 
 	//	現時点で結果が表示されるイベントの終了時刻の範囲を求める。
 	//	tnow.Truncate(24 * time.Hour)はUTCで計算されている模様。
-	//	特にg時まではtnow.Truncate(24 * time.Hour)の結果は1日前になることに注意
+	//	特に9時まではtnow.Truncate(24 * time.Hour)の結果は1日前になることに注意
 	var tday1, tday2 time.Time
 	if hh < 9 {
 		//	12時までは前々日に終了したイベントの結果が表示されるが、9時までは前日相当となる。
