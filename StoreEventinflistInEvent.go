@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 )
 
 func StoreEventinflistInEvent(
@@ -27,7 +27,7 @@ func StoreEventinflistInEvent(
 
 	//	既存データの変化をチェックする必要があるカラムの抽出用SQL
 	sqls := "select endtime, period, noentry, achk from " + tevent + " where eventid = ?"
-	stmts, err = srdblib.Db.Prepare(sqls)
+	stmts, err = Db.Prepare(sqls)
 	if err != nil {
 		err = fmt.Errorf("Prepare(sqls): %w", err)
 		return
@@ -36,7 +36,7 @@ func StoreEventinflistInEvent(
 
 	//	データが変更されたカラムの更新用SQL
 	sqlu := "UPDATE " + tevent + " SET endtime = ?, period = ?, noentry = ?, achk = ? WHERE eventid = ?"
-	stmtu, err = srdblib.Db.Prepare(sqlu)
+	stmtu, err = Db.Prepare(sqlu)
 	if err != nil {
 		err = fmt.Errorf("Prepare(sqlu): %w", err)
 		return
@@ -106,7 +106,7 @@ func StoreEventinflistInEvent(
 	}
 
 	if len(eventinflist) != 0 {
-		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, false)
+		err = srdblib.InsertEventinflistToEvent(Db, tevent, &eventinflist, false)
 		if err != nil {
 			err = fmt.Errorf("InsertEventinflistToEvent(): %w", err)
 			return
