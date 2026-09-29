@@ -8,7 +8,7 @@ import(
 "testing"
 
 "github.com/Chouette2100/exsrapi/v2"
-"github.com/Chouette2100/srdblib/v2"
+"github.com/Chouette2100/srdblib/v3"
 )
 
 func TestExpandEventBoxIntoEvent(t *testing.T) {
@@ -31,7 +31,8 @@ func TestExpandEventBoxIntoEvent(t *testing.T) {
 	log.SetOutput(io.MultiWriter(logfile, os.Stdout))
 
 	//      データベースとの接続をオープンする。
-	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
+	var dbconfig *srdblib.DBConfig
+	Db, dbconfig, err := srdblib.OpenDb("DBConfig.enc.yml")
 	if err != nil {
 		log.Printf("Database error. err=%s.\n", err.Error())
 		return
@@ -39,7 +40,7 @@ func TestExpandEventBoxIntoEvent(t *testing.T) {
 	if dbconfig.UseSSH {
 		defer srdblib.Dialer.Close()
 	}
-	defer srdblib.Db.Close()
+	defer Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
 	//	srdblib.Tevent = "wevent"

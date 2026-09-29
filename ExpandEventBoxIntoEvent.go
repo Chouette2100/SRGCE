@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 	"log"
 )
 
@@ -49,12 +49,12 @@ func ExpandEventBoxIntoEvent(
 			}
 		}
 
-		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, true)
+		err = srdblib.InsertEventinflistToEvent(Db, tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return
 		}
-		_, err = srdblib.Db.Exec("UPDATE " + tevent + " SET achk = ? where eventid = ?", EventBox % 4, eid)
+		_, err = Db.Exec("UPDATE " + tevent + " SET achk = ? where eventid = ?", EventBox % 4, eid)
 		log.Printf("  %s is Event Box. Number of Child Event is %d\n", eid, len(eventinflist))
 
 	}

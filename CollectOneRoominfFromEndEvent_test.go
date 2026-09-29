@@ -16,7 +16,7 @@ import (
 
 	"github.com/go-gorp/gorp"
 
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 	"github.com/Chouette2100/exsrapi/v2"
 
 )
@@ -41,7 +41,8 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 	log.SetOutput(io.MultiWriter(logfile,os.Stdout))
 
 		//      データベースとの接続をオープンする。
-		dbconfig, err := srdblib.OpenDb("DBConfig.yml")
+		var dbconfig *srdblib.DBConfig
+		Db, dbconfig, err = srdblib.OpenDb("DBConfig.enc.yml")
 		if err != nil {
 			log.Printf("srdblib.OpenDb() error. err=%s.\n", err.Error())
 			return
@@ -49,7 +50,7 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 		if dbconfig.UseSSH {
 			defer srdblib.Dialer.Close()
 		}
-		defer srdblib.Db.Close()
+		defer Db.Close()
 	
 		log.Printf("dbconfig=%v\n",	dbconfig)
 	
@@ -59,11 +60,10 @@ func TestCollectOneRoominfFromEndEvent(t *testing.T) {
 		//	srdblib.Tuserhistory = "wuserhistory"
 	
 		dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
-		srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
-		srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
-		srdblib.Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
-		srdblib.Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
-		srdblib.Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+		Dbmap = &gorp.DbMap{Db: Db, Dialect: dial, ExpandSliceArgs: true}
+		Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
+		Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+		Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
 
 
 		//      cookiejarがセットされたHTTPクライアントを作る

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 
 	"github.com/go-gorp/gorp"
 )
@@ -31,7 +31,8 @@ func TestMakeDataOfNewEvents(t *testing.T) {
 	log.SetOutput(io.MultiWriter(logfile, os.Stdout))
 
 	//      データベースとの接続をオープンする。
-	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
+	var dbconfig *srdblib.DBConfig
+	Db, dbconfig, err := srdblib.OpenDb("DBConfig.enc.yml")
 	if err != nil {
 		log.Printf("Database error. err=%s.\n", err.Error())
 		return
@@ -39,7 +40,7 @@ func TestMakeDataOfNewEvents(t *testing.T) {
 	if dbconfig.UseSSH {
 		defer srdblib.Dialer.Close()
 	}
-	defer srdblib.Db.Close()
+	defer Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
 	//	srdblib.Tevent = "wevent"
@@ -48,10 +49,10 @@ func TestMakeDataOfNewEvents(t *testing.T) {
 	//	srdblib.Tuserhistory = "wuserhistory"
 
 	dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
-	srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
+	Dbmap = &gorp.DbMap{Db: Db, Dialect: dial, ExpandSliceArgs: true}
 
-	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
-	srdblib.Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
+	Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
+	Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

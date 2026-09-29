@@ -17,7 +17,7 @@ import (
 
 	"github.com/Chouette2100/exsrapi/v2"
 	//	"github.com/Chouette2100/srapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 )
 
 func CollectOneRoominfFromEndEvent(
@@ -43,7 +43,7 @@ func CollectOneRoominfFromEndEvent(
 	nrow := 0
 	//	sqlsc := "select count(*) from " + teventuser + " where eventid = ?"
 	sqlsc := "select count(*) from wevent where eventid = ?"
-	srdblib.Db.QueryRow(sqlsc, eid).Scan(&nrow)
+	Db.QueryRow(sqlsc, eid).Scan(&nrow)
 	if nrow > 0 {
 		//	取得済み
 		log.Printf("    data exists. skip.\n")
@@ -53,7 +53,7 @@ func CollectOneRoominfFromEndEvent(
 
 	//	====================================== ここから GetEventsRankingByApi()
 
-	pranking, err := srdblib.GetEventsRankingByApi(client, eid, 2)
+	pranking, err := srdblib.GetEventsRankingByApi(Dbmap, client, eid, 2)
 	if err != nil {
 		err = fmt.Errorf("GetEventsRankingByApi(): %w", err)
 		return err
@@ -130,7 +130,7 @@ func CollectOneRoominfFromEndEvent(
 		wuser := new(srdblib.Wuser)
 		wuser.Userno = uinf.Userno
 		// err = srdblib.UpinsWuserSetProperty(client, tnow, wuser, 1440 * 5, 1000)
-		_, err = srdblib.UpinsUser(client, tnow, wuser)
+		_, err = srdblib.UpinsUser(Dbmap, client, tnow, wuser)
 		if err != nil {
 			err = fmt.Errorf("InsertIntoOrUpdateUser(): %w", err)
 			return err

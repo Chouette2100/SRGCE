@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	//	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	// "github.com/Chouette2100/srdblib/v3"
 )
 
 func CreateEventuserFromEventinf(
@@ -34,7 +34,7 @@ func CreateEventuserFromEventinf(
 	//	sqls := "select count(*) from " + teventuser + " where userno =? and eventid = ?"
 	sqls := "select count(*) from weventuser where userno =? and eventid = ?"
 	//	err = srdblib.Db.QueryRow(sqls, roominf.ID, eventid).Scan(&nrow)
-	err = srdblib.Db.QueryRow(sqls, userno, eventid).Scan(&nrow)
+	err = Db.QueryRow(sqls, userno, eventid).Scan(&nrow)
 	if err != nil {
 		//	log.Printf("select count(*) from user ... err=[%s]\n", err.Error())
 		err = fmt.Errorf("QueryRow().Scan(): %w", err)
@@ -46,7 +46,7 @@ func CreateEventuserFromEventinf(
 		var stmti *sql.Stmt
 		//	sqli := "INSERT INTO " + teventuser + "(eventid, userno, point, vld) VALUES(?,?,?,?)"
 		sqli := "INSERT INTO weventuser (eventid, userno, point, vld) VALUES(?,?,?,?)"
-		stmti, err = srdblib.Db.Prepare(sqli)
+		stmti, err = Db.Prepare(sqli)
 		if err != nil {
 			//	log.Printf("error(INSERT/Prepare) err=%s\n", err.Error())
 			err = fmt.Errorf("Prepare(): %w", err)

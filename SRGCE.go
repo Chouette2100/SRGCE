@@ -183,8 +183,11 @@ import (
 
 	"github.com/go-gorp/gorp"
 
+	"database/sql"
+
+
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 )
 
 /*
@@ -227,10 +230,15 @@ Ver. 02AC02 起動時パラメータとしてイベントIDを指定するとブ
 Ver. 02AC03 select * を使わず、カラム名を指定する。
 Ver. 200100 go.modを作り直す
 Ver. 200101 構造体からテーブルのカラム名を作成する関数を追加したsrdblibを使用する。
+Ver. 200102 thpoint.txtを変更しgitの対象とする
+Ver. 200200 sops/ageによるDBConfig.ymlの暗号化に対応する。srdblib v3に対応し、DbとDmapをグローバル変数にする。
 */
-const Version = "200101"
+const Version = "200200"
 
 var targetEvent string
+
+var Db *sql.DB
+var Dbmap *gorp.DbMap
 
 func main() {
 
@@ -261,7 +269,8 @@ func main() {
 	defer jar.Save()
 
 	//      データベースとの接続をオープンする。
-	dbconfig, err := srdblib.OpenDb("DBConfig.yml")
+	var dbconfig *srdblib.DBConfig
+	Db, dbconfig, err = srdblib.OpenDb("DBConfig.enc.yml")
 	if err != nil {
 		log.Printf("Database error. err=%s.\n", err.Error())
 		return
@@ -269,17 +278,17 @@ func main() {
 	if dbconfig.UseSSH {
 		defer srdblib.Dialer.Close()
 	}
-	defer srdblib.Db.Close()
+	defer Db.Close()
 	log.Printf("dbconfig=%+v.\n", dbconfig)
 
 	dial := gorp.MySQLDialect{Engine: "InnoDB", Encoding: "utf8mb4"}
-	srdblib.Dbmap = &gorp.DbMap{Db: srdblib.Db, Dialect: dial, ExpandSliceArgs: true}
-	srdblib.Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
-	srdblib.Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
-	srdblib.Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
-	srdblib.Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
+	Dbmap = &gorp.DbMap{Db: Db, Dialect: dial, ExpandSliceArgs: true}
+	Dbmap.AddTableWithName(srdblib.Wuser{}, "wuser").SetKeys(false, "Userno")
+	Dbmap.AddTableWithName(srdblib.Wuserhistory{}, "wuserhistory").SetKeys(false, "Userno", "Ts")
+	Dbmap.AddTableWithName(srdblib.Wevent{}, "wevent").SetKeys(false, "Eventid")
+	Dbmap.AddTableWithName(srdblib.Weventuser{}, "weventuser").SetKeys(false, "Eventid", "Userno")
 
-	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
+	Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
 
 	//	現在開催中のイベントの一覧を求める。
 	//	status: 1: 開催中(デフォルト)、 3: 開催予定、 4: 終了済み

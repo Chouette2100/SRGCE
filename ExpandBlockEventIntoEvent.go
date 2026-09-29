@@ -11,7 +11,7 @@ import (
 
 	"github.com/Chouette2100/exsrapi/v2"
 	"github.com/Chouette2100/srapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 )
 
 func ExpandBlockEventIntoEvent(
@@ -103,7 +103,7 @@ func ExpandBlockEventIntoEvent(
 				// err = exsrapi.GetEventinf(eidb, &eventinf)
 				var weventinf srdblib.Wevent
 				var intf interface{}
-				intf, err = srdblib.Dbmap.Get(&weventinf, eid)
+				intf, err = Dbmap.Get(&weventinf, eid)
 				if err != nil {
 					log.Printf("GetEventinf(): %v", err)
 					//	return fmt.Errorf("GetEventinf(): %v", status)
@@ -124,7 +124,7 @@ func ExpandBlockEventIntoEvent(
 				}
 			}
 		}
-		err = srdblib.InsertEventinflistToEvent(tevent, &eventinflist, true)
+		err = srdblib.InsertEventinflistToEvent(Db, tevent, &eventinflist, true)
 		if err != nil {
 			err = fmt.Errorf("srdblib.InsertEventinflistToEvent(): %w", err)
 			return
@@ -138,14 +138,14 @@ func ExpandBlockEventIntoEvent(
 				if tevent != "wevent" {
 					err = fmt.Errorf("ExpandBlockEventIntoEvent(): tevent != wevent")
 				} else {
-					intf, err = srdblib.Dbmap.Get(&wev, eventinf.Event_ID)
+					intf, err = Dbmap.Get(&wev, eventinf.Event_ID)
 				}
 				if err != nil || intf == nil || intf.(*srdblib.Wevent).Event_name == eventinf.Event_name {
 					log.Printf("  **Ignored[%s]: %s\n", eventinf.Event_ID, eventinf.Event_name)
 				} else {
 					wev = *intf.(*srdblib.Wevent)
 					wev.Event_name = eventinf.Event_name
-					_, err = srdblib.Dbmap.Update(&wev)
+					_, err = Dbmap.Update(&wev)
 					if err != nil {
 						log.Printf("Update(): %v", err)
 					}
@@ -153,7 +153,7 @@ func ExpandBlockEventIntoEvent(
 				}
 			}
 		}
-		_, err = srdblib.Db.Exec("UPDATE "+tevent+" SET achk = ? where eventid = ?", BlockEvent%4, eid)
+		_, err = Db.Exec("UPDATE "+tevent+" SET achk = ? where eventid = ?", BlockEvent%4, eid)
 		log.Printf("  %s is BlockEvent. Number of Child Event is %d\n", eid, len(eventinflist))
 
 	}

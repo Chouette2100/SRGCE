@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	// "github.com/Chouette2100/srdblib/v2"
 )
 
 func InsertIntoOrUpdateUser(
@@ -30,7 +30,7 @@ func InsertIntoOrUpdateUser(
 
 	//	レコードがすでに存在するか？
 	nrow := 0
-	err = srdblib.Db.QueryRow("select count(*) from " + tuser + " where userno =" + roominf.ID).Scan(&nrow)
+	err = Db.QueryRow("select count(*) from " + tuser + " where userno =" + roominf.ID).Scan(&nrow)
 
 	if err != nil {
 		err = fmt.Errorf("QueryRow(): %w", err)
@@ -60,7 +60,7 @@ func InsertIntoOrUpdateUser(
 
 		//	log.Printf("sql=%s\n", sql)
 		var stmti *sql.Stmt
-		stmti, err = srdblib.Db.Prepare(sqli)
+		stmti, err = Db.Prepare(sqli)
 		if err != nil {
 			//	log.Printf("InsertIntoOrUpdateUser() error() (INSERT/Prepare) err=%s\n", err.Error())
 			err = fmt.Errorf("Prepare(): %w", err)
@@ -116,7 +116,7 @@ func InsertIntoOrUpdateUser(
 	} else {
 		//	存在する。
 		sqls := "select user_name, genre, `rank`, nrank, prank, level, followers, fans, fans_lst from " + tuser + "  where userno = ?"
-		err = srdblib.Db.QueryRow(sqls, userno).Scan(&name, &genre, &rank, &nrank, &prank, &level, &followers, &fans, &fans_lst)
+		err = Db.QueryRow(sqls, userno).Scan(&name, &genre, &rank, &nrank, &prank, &level, &followers, &fans, &fans_lst)
 		if err != nil {
 			log.Printf("err=[%s]\n", err.Error())
 			err = fmt.Errorf("WueryRow().Scan(): %w", err)
@@ -149,7 +149,7 @@ func InsertIntoOrUpdateUser(
 			sqlu += "currentevent=? "
 			sqlu += "where userno=?"
 			var stmtu *sql.Stmt
-			stmtu, err = srdblib.Db.Prepare(sqlu)
+			stmtu, err = Db.Prepare(sqlu)
 
 			if err != nil {
 				log.Printf("InsertIntoOrUpdateUser() error(Update/Prepare) err=%s\n", err.Error())
@@ -191,7 +191,7 @@ func InsertIntoOrUpdateUser(
 		sqli += " VALUES(?,?,?,?,?,?,?,?,?,?,?)"
 		//	log.Printf("sql=%s\n", sql)
 		var stmti *sql.Stmt
-		stmti, err = srdblib.Db.Prepare(sqli)
+		stmti, err = Db.Prepare(sqli)
 		if err != nil {
 			log.Printf("error(INSERT into userhistory/Prepare) err=%s\n", err.Error())
 			err = fmt.Errorf("(userhistory) Prepare(): %w", err)

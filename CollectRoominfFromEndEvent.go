@@ -16,7 +16,7 @@ import (
 
 	"github.com/Chouette2100/exsrapi/v2"
 	//	"github.com/Chouette2100/srapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	// "github.com/Chouette2100/srdblib/v3"
 )
 
 type Uinf struct {
@@ -72,7 +72,7 @@ func CollectRoominfFromEndEvent(
 	log.Printf("tday2: %s\n", tday2.Format("2006-01-02 15:04:05 MST"))
 
 	sqlstmt := "select eventid from " + tevent + " where achk = 0 and endtime > ? and endtime < ?"
-	stmt, err = srdblib.Db.Prepare(sqlstmt)
+	stmt, err = Db.Prepare(sqlstmt)
 	if err != nil {
 		err = fmt.Errorf("srdblib.Db.Prepare(): %w", err)
 		return

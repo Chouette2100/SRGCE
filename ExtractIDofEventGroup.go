@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	// "github.com/Chouette2100/srdblib/v3"
 )
 
 const EventBox = 6
@@ -35,7 +35,7 @@ func ExtractIDofEventGroup(
 		sqlstmt = "select eventid from " + tevent + " where eventid = ? "
 	}
 
-	stmt, err = srdblib.Db.Prepare(sqlstmt)
+	stmt, err = Db.Prepare(sqlstmt)
 	if err != nil {
 		err = fmt.Errorf("row.Priepare(): %w", err)
 		return

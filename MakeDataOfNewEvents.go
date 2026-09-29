@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/copier"
 
 	"github.com/Chouette2100/exsrapi/v2"
-	"github.com/Chouette2100/srdblib/v2"
+	"github.com/Chouette2100/srdblib/v3"
 )
 
 func MakeDataOfNewEvents() (err error) {
@@ -33,7 +33,7 @@ func MakeDataOfNewEvents() (err error) {
 	sqlst += "  order by starttime "
 
 	var rows []interface{}
-	rows, err = srdblib.Dbmap.Select(srdblib.Wevent{}, sqlst, thdata.Hh, thdata.Hh)
+	rows, err = Dbmap.Select(srdblib.Wevent{}, sqlst, thdata.Hh, thdata.Hh)
 
 	//	srdblib.Dbmap.AddTableWithName(srdblib.Event{}, "event").SetKeys(false, "Eventid")
 	for _, v := range rows {
@@ -90,7 +90,7 @@ func MakeDataOfEvent(event *srdblib.Event, thdata *exsrapi.Thdata) (err error) {
 
 	log.Printf("Thinit=%d, Thdelta=%d\n", event.Thinit, event.Thdelta)
 
-	err = srdblib.Dbmap.Insert(event)
+	err = Dbmap.Insert(event)
 	if err != nil {
 		err = fmt.Errorf("Dbmap.Insert() error: %w", err)
 	}
