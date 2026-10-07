@@ -1,8 +1,8 @@
 items:
   - kind: file
-    src: DBConfig.enc.yaml
+    src: DBConfig.enc.yml
   - kind: rename
-    src: srgce.sh.VPS
+    src: srgce_VPS.sh
     dest: srgce.sh
   - kind: rename
     src: thpoint.txt.VPS
