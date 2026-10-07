@@ -1,1 +1,26 @@
-DBConfig_9911.enc.yml
+# リモートと接続するときSSHを使うか？
+# 指定しなければ使用しない（false）
+#UseSSH: true
+#
+## DBサーバーのホスト名、指定しなければlocalhost
+DBhost: ${DBHOST}
+## DBサーバーのポート番号、指定しなければデフォルトポート
+DBport: ${DBPORT}
+DBname: ENC[AES256_GCM,data:jm1V39rywFE=,iv:XSnvnSSeJL1EHQ3Sc329VsA28DajbExi2BlNSLKp/yg=,tag:7jgG/wjfkyHvFamjMwCTdg==,type:str]
+DBuser: ENC[AES256_GCM,data:s10IWgpoVQ==,iv:AE+nmNd5KuPhNY3OD0n67vs1RDFPzjhiJr1LndLSKjs=,tag:V+J2i5TikESawPH2TBQM4Q==,type:str]
+DBpswd: ENC[AES256_GCM,data:6ewN/QZFEYNm/rY=,iv:bX9A0ZFGRhOogIaJDegN0MJtJWxlqKhwQpaByDnkl54=,tag:2ERsbUwVxRzaFe1DDXps1g==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwMEpiTVdWQnF1dXJ1QWdT
+            QmJMZXdwdEpSNm1JamFod2xJbUFlL0NhcEFNCktTbk01MkEwMmJ6R1FCNDhHNmU1
+            V21ZK0lkbGF3KzlabHcySldZRXlPNTAKLS0tIFVaNlVYSkRTVE5ZTlV2bm5SczNR
+            UzBubnRPc3J2dzJqaXB0TVdqUzR1ZTAK3VFak3eO0IwqTeNDbyHWxIqOCYWTcgNO
+            XICaTxAVSU24EzlniEmijzEVQsW1lk99BnPTyYDj5MLeUynIUvjTRw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age13mlf945e3emk75ys348xttw048ufq7vpgw7l94g63tl5pt03mdrsfqra2l
+    encrypted_regex: ^(apikey|SRuser|SRpswd|DBuser|DBpswd|DBname|TurnstileSiteKey|TurnstileSecretKey|IPEncryptionKeyHex|sr_acct|sr_pswd)$
+    lastmodified: "2026-10-07T00:09:08Z"
+    mac: ENC[AES256_GCM,data:/PwE2t7O1vePG9H02pshzdm6IWOJz/SXVqowdVB6glu0vQVb/WZZR6tDRryh+yskg/o2omludFHDxVrfqSbiJNrv7sQKm6aLPc8PXR6uvpocZeDP0D/Zhvri2LcQdo82ryMPUQoXwM4ZCGvnbWDph4F7G8kSPMrmc2Kgcp1+zJ8=,iv:KVQUCrP9cuFvBXX0bMItPkoFCjWibhGkfmb0/wxQoIU=,tag:iE9cBc8OgrreGydx9wcutw==,type:str]
+    version: 3.13.3

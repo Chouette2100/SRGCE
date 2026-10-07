@@ -232,9 +232,10 @@ Ver. 200100 go.modを作り直す
 Ver. 200101 構造体からテーブルのカラム名を作成する関数を追加したsrdblibを使用する。
 Ver. 200102 thpoint.txtを変更しgitの対象とする
 Ver. 200200 sops/ageによるDBConfig.ymlの暗号化に対応する。srdblib v3に対応し、DbとDmapをグローバル変数にする。
-Ver. 200300 NixPackagesの導入に対応する。
+Ver. 200300 NixPackagesの導入に対応する(0)
+Ver. 200301 NixPackagesの導入に対応する(1)
 */
-const Version = "200300"
+const Version = "200301"
 
 var targetEvent string
 
