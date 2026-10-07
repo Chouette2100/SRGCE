@@ -1,0 +1,16 @@
+items:
+  - kind: file
+    src: DBConfig.enc.yaml
+  - kind: rename
+    src: srgce.sh.VPS
+    dest: srgce.sh
+  - kind: rename
+    src: thpoint.txt.VPS
+    dest: thpoint.txt
+
+# kind: write
+# src は使わず、/var/lib/srcgi に実体を作る。
+# 例:
+#  - kind: write
+#    dest: runtime-state.txt
+#    mode: "0644"

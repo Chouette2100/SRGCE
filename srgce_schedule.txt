@@ -1,0 +1,4 @@
+# m h  dom mon dow   command
+# SRGCE
+5-59/30 * * * * ~chouette/MyProject/Showroom/SRGCE/srgce.sh
+20-59/30 18-19/1 * * * ~chouette/MyProject/Showroom/SRGCE/srgce.sh

@@ -234,8 +234,9 @@ Ver. 200102 thpoint.txtを変更しgitの対象とする
 Ver. 200200 sops/ageによるDBConfig.ymlの暗号化に対応する。srdblib v3に対応し、DbとDmapをグローバル変数にする。
 Ver. 200300 NixPackagesの導入に対応する(0)
 Ver. 200301 NixPackagesの導入に対応する(1)
+Ver. 200301 NixPackagesの導入に対応する(2)
 */
-const Version = "200301"
+const Version = "200302"
 
 var targetEvent string
 
