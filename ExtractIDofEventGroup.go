@@ -29,7 +29,8 @@ func ExtractIDofEventGroup(
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 
-	sqlstmt := "select eventid from " + tevent + " where starttime > Now() and (achk = ? or achk = ?) "
+	// sqlstmt := "select eventid from " + tevent + " where starttime > Now() and (achk = ? or achk = ?) "
+	sqlstmt := "select eventid from " + tevent + " where endtime > Now() and (achk = ? or achk = ?) "
 	if targetEvent != "" {
 		// 特定のブロックイベントの展開を行う場合
 		sqlstmt = "select eventid from " + tevent + " where eventid = ? "
