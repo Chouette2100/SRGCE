@@ -3,23 +3,24 @@
 #UseSSH: true
 #
 ## DBサーバーのホスト名、指定しなければlocalhost
-DBhost: 127.0.0.1
-DBport: 9911
-DBuser: ENC[AES256_GCM,data:bxYX+JsEmw==,iv:rotzrktDggDjDSnnlq0HppDCPsAdmxLt5NlVKotnNac=,tag:+0Bu6P5sqLosFAyuVJ6WXw==,type:str]
-DBpswd: ENC[AES256_GCM,data:wolHSRefPC9+6ko=,iv:tZK9bZaRF+Q0EWg0Nocbyerr5ydKmhdHiXCBYsH6TPU=,tag:NgOqC5VjMZl+gaPK2j+GdQ==,type:str]
-DBname: ENC[AES256_GCM,data:1cqcXGggLvk=,iv:AhANQzjx5u4KpKiuWL3mLrp3Xmm+cELStX4ftGg4cRk=,tag:bD3t4R3geiuEPBrYaRoG2w==,type:str]
+DBhost: ${DBHOST}
+## DBサーバーのポート番号、指定しなければデフォルトポート
+DBport: ${DBPORT}
+DBname: ENC[AES256_GCM,data:jm1V39rywFE=,iv:XSnvnSSeJL1EHQ3Sc329VsA28DajbExi2BlNSLKp/yg=,tag:7jgG/wjfkyHvFamjMwCTdg==,type:str]
+DBuser: ENC[AES256_GCM,data:s10IWgpoVQ==,iv:AE+nmNd5KuPhNY3OD0n67vs1RDFPzjhiJr1LndLSKjs=,tag:V+J2i5TikESawPH2TBQM4Q==,type:str]
+DBpswd: ENC[AES256_GCM,data:6ewN/QZFEYNm/rY=,iv:bX9A0ZFGRhOogIaJDegN0MJtJWxlqKhwQpaByDnkl54=,tag:2ERsbUwVxRzaFe1DDXps1g==,type:str]
 sops:
     age:
         - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAxOXk3UHQrQ2Vvdy9XdTFr
-            L3ZJOHBoZVRiNkNIZW5MNFNjeVE5ajkrTVZNCmVMVFFuVTlMQmZ6MThmNEh4UUFT
-            Vi9VaitWajNuR0dNbDZpWHBvb3FIZGsKLS0tIDgreEpmUVA0QTMwOW5McnEzTXMz
-            YWo5NExWWnF1YTZkMVpkNDFYME9kQTgKL101ysCIux4m/QSjTsPKOHr0SezMk+zl
-            jiZF2Z74u73F/IEvgfyzfQ5tsizYGgH3HIqcJpipSoMQ57AOe+5/ug==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwMEpiTVdWQnF1dXJ1QWdT
+            QmJMZXdwdEpSNm1JamFod2xJbUFlL0NhcEFNCktTbk01MkEwMmJ6R1FCNDhHNmU1
+            V21ZK0lkbGF3KzlabHcySldZRXlPNTAKLS0tIFVaNlVYSkRTVE5ZTlV2bm5SczNR
+            UzBubnRPc3J2dzJqaXB0TVdqUzR1ZTAK3VFak3eO0IwqTeNDbyHWxIqOCYWTcgNO
+            XICaTxAVSU24EzlniEmijzEVQsW1lk99BnPTyYDj5MLeUynIUvjTRw==
             -----END AGE ENCRYPTED FILE-----
           recipient: age13mlf945e3emk75ys348xttw048ufq7vpgw7l94g63tl5pt03mdrsfqra2l
     encrypted_regex: ^(apikey|SRuser|SRpswd|DBuser|DBpswd|DBname|TurnstileSiteKey|TurnstileSecretKey|IPEncryptionKeyHex|sr_acct|sr_pswd)$
-    lastmodified: "2026-09-29T06:18:22Z"
-    mac: ENC[AES256_GCM,data:dX7ckT89BNwcDhgip4wdeg+v+S12TRwFRKSbuvf3jEg+QW6G06W72KTBhO/SppUwlve4K22G8LOuswD4E4omkc55ibGNtdtSQsV1ODhsuYMASX8RhH+WKyd7n72ZSxJjtkI6lnih/tc2gD9KdEB3RjIeQHZ7pMG+Ab/UPxkrobc=,iv:9sxRBWS+u1gicvIlXQJ5V18sEdnSloIY0UyNMHCdNOo=,tag:kzLix0ZEnOaomrEOqPAgsw==,type:str]
-    version: 3.13.1
+    lastmodified: "2026-10-07T00:09:08Z"
+    mac: ENC[AES256_GCM,data:/PwE2t7O1vePG9H02pshzdm6IWOJz/SXVqowdVB6glu0vQVb/WZZR6tDRryh+yskg/o2omludFHDxVrfqSbiJNrv7sQKm6aLPc8PXR6uvpocZeDP0D/Zhvri2LcQdo82ryMPUQoXwM4ZCGvnbWDph4F7G8kSPMrmc2Kgcp1+zJ8=,iv:KVQUCrP9cuFvBXX0bMItPkoFCjWibhGkfmb0/wxQoIU=,tag:iE9cBc8OgrreGydx9wcutw==,type:str]
+    version: 3.13.3
