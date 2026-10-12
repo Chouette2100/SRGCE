@@ -237,8 +237,9 @@ Ver. 200301 NixPackagesの導入に対応する(1)
 Ver. 200302 NixPackagesの導入に対応する(2)
 Ver. 200303 NixPackagesの導入に対応する(3)
 Ver. 200304 ブロックイベントの展開対象を未開催のイベントから未終了のイベントに変更する。
+Ver. 200305 thpoint.txt	を本番環境の設定値に更新する。
 */
-const Version = "200304"
+const Version = "200305"
 
 var targetEvent string
 
