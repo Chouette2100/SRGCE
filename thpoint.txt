@@ -3,8 +3,8 @@
 # From: Fromorder
 # To: Toorder 0だとデータ収集の対象としない
 # Hh From To
-# 12 0 0
-45 1 40
+# 45 1 40
+12 0 0
 #
 # イベントIDあるいはイベント名が特定の条件を満たす場合は、その条件に対応する基準値を設定する
 # word1 word2 thinit thdelta　　イベントIDにword1が含まれ、イベントネームにword2が含まれるとき
